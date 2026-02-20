@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Servicios a Cotizar</title>
+</head>
+<body>
+
+<h2>Servicios a Cotizar</h2>
+<button onclick="cerrarSesion()">Cerrar sesión</button>
+  <p>Seleccione una opción:</p>
+<label>
+  <input type="radio" name="tipo" id="opcionCotizacion" value="COTIZACION">Cotización Base
+</label>
+
+<label>
+  <input type="radio" name="tipo" id="opcionVisita" value="VISITA"> Visita Técnica
+</label>
+
+<hr>
+
+<!-- BLOQUE COTIZACIÓN -->
+<div id="bloqueCotizacion" style="display:none;">
+  <h3>Seleccione los servicios</h3>
+
+  <label><input type="checkbox" class="servicioCheck" value="1"> Mano de Obra y Materiales</label><br>
+  <label><input type="checkbox" class="servicioCheck" value="2"> Carpintería</label><br>
+  <label><input type="checkbox" class="servicioCheck" value="3"> Divisiones en Vidrio</label><br>
+  <label><input type="checkbox" class="servicioCheck" value="4"> Mesón Granito</label><br>
+  <label><input type="text" id="nombre_proyecto_usuario" required>Nombre del Proyecto:</label><br><br>
+  
+  <button id="btnCotizar">Ir a Cotización Base</button>
+</div>
+
+<!-- BLOQUE VISITA -->
+<div id="bloqueVisita" style="display:none;">
+  <h3>Datos de la visita técnica</h3>
+
+  <label>Fecha: <input type="date" id="fechaVisita"></label><br>
+  <label>Hora: <input type="time" id="horaVisita"></label><br>
+  <label>Dirección: <input type="text" id="direccionVisita"></label> <br><br>
+  
+  <button type="submit">Agendar Visita</button>
+</div>
+
+<!-- Enlace al archivo JS -->
+<script src="js/ServiciosACotizar.js"></script>
+
+</body>
+</html>
