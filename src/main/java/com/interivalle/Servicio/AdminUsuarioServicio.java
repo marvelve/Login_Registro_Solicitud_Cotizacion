@@ -52,6 +52,7 @@ public class AdminUsuarioServicio {
         if (dto.getCiudadUsuario() != null) {
         u.setCiudadUsuario(dto.getCiudadUsuario());
         }
+
         return usuarioRepo.save(u);
     }
 

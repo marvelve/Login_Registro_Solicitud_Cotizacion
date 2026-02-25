@@ -4,7 +4,6 @@
  */
 package com.interivalle.DTO;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 /**
  *
@@ -17,7 +16,6 @@ public class UsuarioUpdate {
     private String nombreUsuario;
     private String celularUsuario;
     private String ciudadUsuario;
-
     // getters y setters
 
     public String getNombreUsuario() {
@@ -45,5 +43,6 @@ public class UsuarioUpdate {
     }
     
     
+     
 }
 

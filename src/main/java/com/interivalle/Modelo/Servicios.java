@@ -17,8 +17,8 @@ public class Servicios {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_servicio")
-    private Integer idServicio;
+    @Column(name = "id_servicios")
+    private Integer idServicios;
 
     @Column(name = "nombre_servicio", nullable = false, unique = true)
     private String nombreServicio;
@@ -39,11 +39,11 @@ public class Servicios {
     // ------------------ GETTERS Y SETTERS ------------------
 
     public Integer getIdServicio() {
-        return idServicio;
+        return idServicios;
     }
 
-    public void setIdServicio(Integer idServicio) {
-        this.idServicio = idServicio;
+    public void setIdServicio(Integer idServicios) {
+        this.idServicios = idServicios;
     }
 
     public String getNombreServicio() {

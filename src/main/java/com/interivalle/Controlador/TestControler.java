@@ -18,15 +18,15 @@ public class TestControler {
     @GetMapping("/public")
     public String publico() { return "OK público"; }
 
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('Cliente')")
     @GetMapping("/cliente")
     public String cliente() { return "OK cliente"; }
 
-    @PreAuthorize("hasRole('SUPERVISOR')")
+    @PreAuthorize("hasRole('Supervisor')")
     @GetMapping("/supervisor")
     public String supervisor() { return "OK supervisor"; }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     @GetMapping("/admin")
     public String admin() { return "OK admin"; }
 }
