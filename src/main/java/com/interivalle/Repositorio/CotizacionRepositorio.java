@@ -23,6 +23,8 @@ public interface CotizacionRepositorio extends JpaRepository<Cotizacion, Integer
     // Filtros opcionales
     List<Cotizacion> findBySolicitud_Usuario_IdUsuarioAndEstado(Integer idUsuario, EstadoCotizacion estado);
 
+    Optional<Cotizacion> findFirstBySolicitud_IdSolicitudAndEstado(Integer idSolicitud, EstadoCotizacion estado);
+
     List<Cotizacion> findBySolicitud_Usuario_IdUsuarioAndTipo(Integer idUsuario, TipoCotizacion tipo);
 
     List<Cotizacion> findBySolicitud_Usuario_IdUsuarioAndEstadoAndTipo(

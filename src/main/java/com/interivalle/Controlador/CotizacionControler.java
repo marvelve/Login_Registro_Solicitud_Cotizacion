@@ -6,6 +6,7 @@ package com.interivalle.Controlador;
 
 import com.interivalle.DTO.CrearCotizacionRequest;
 import com.interivalle.DTO.CotizacionResponse;
+import com.interivalle.DTO.GenerarCotizacionBaseRequest;
 import com.interivalle.DTO.ObservacionRequest;
 import com.interivalle.Servicio.CotizacionService;
 import jakarta.validation.Valid;
@@ -113,4 +114,13 @@ public class CotizacionControler {
         Integer idUsuario = getUserIdFromHeader(xUserId);
         return service.rechazar(idUsuario, id, req);
     }
+    
+    @PostMapping("/cliente/cotizaciones/generar-base")
+        public CotizacionResponse generarCotizacionBase(
+                @RequestHeader("X-USER-ID") String xUserId,
+                @Valid @RequestBody GenerarCotizacionBaseRequest req
+        ) {
+            Integer idUsuario = getUserIdFromHeader(xUserId);
+            return service.generarCotizacionBaseDesdeSolicitud(idUsuario, req);
+        }
 }

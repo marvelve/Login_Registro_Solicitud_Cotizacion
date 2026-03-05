@@ -19,7 +19,7 @@ public class CotizacionDetalleResponse {
 
     private TipoItemCotizacion tipoItem;
     private String categoria;
-    private String semana;
+    private Integer semana;
     private String descripcion;
 
     private BigDecimal cantidad;
@@ -41,8 +41,8 @@ public class CotizacionDetalleResponse {
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
 
-    public String getSemana() { return semana; }
-    public void setSemana(String semana) { this.semana = semana; }
+    public Integer getSemana() { return semana; }
+    public void setSemana(Integer semana) { this.semana = semana; }
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }

@@ -34,31 +34,6 @@ public class SolicitudControler {
         return ResponseEntity.ok(service.obtenerSolicitud(idSolicitud));
     }
 
-    // PASO 2: guardar formularios (1 endpoint por servicio)
-    @PostMapping("/obra-blanca")
-    public ResponseEntity<String> guardarObraBlanca(@RequestBody ObraBlancaDTO dto) {
-        service.guardarObraBlanca(dto);
-        return ResponseEntity.ok("Obra Blanca guardada");
-    }
-
-    @PostMapping("/carpinteria")
-    public ResponseEntity<String> guardarCarpinteria(@RequestBody CarpinteriaDTO dto) {
-        service.guardarCarpinteria(dto);
-        return ResponseEntity.ok("Carpintería guardada");
-    }
-
-    @PostMapping("/vidrio")
-    public ResponseEntity<String> guardarVidrio(@RequestBody VidrioDTO dto) {
-        service.guardarVidrio(dto);
-        return ResponseEntity.ok("Vidrio guardado");
-    }
-
-    @PostMapping("/mezon")
-    public ResponseEntity<String> guardarMezon(@RequestBody MezonDTO dto) {
-        service.guardarMezon(dto);
-        return ResponseEntity.ok("Mesón guardado");
-    }
-
     // Finalizar solicitud
     @PatchMapping("/{idSolicitud}/enviar")
     public ResponseEntity<String> enviar(@PathVariable Integer idSolicitud) {

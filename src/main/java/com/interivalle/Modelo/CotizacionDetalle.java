@@ -31,7 +31,7 @@ public class CotizacionDetalle {
     @JoinColumn(name = "id_servicio", nullable = false)
     private Servicios servicio;
 
-    // MANO_OBRA / MATERIAL / PRODUCTO
+    // ACTIVIDAD / MATERIAL / PRODUCTO
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_item", nullable = false)
     private TipoItemCotizacion tipoItem;
@@ -42,7 +42,7 @@ public class CotizacionDetalle {
 
     // Solo aplica a Obra Blanca si quieres (SEMANA 1, SEMANA 2...)
     @Column(name = "semana", length = 50)
-    private String semana;
+    private Integer semana;
 
     @Column(name = "descripcion", length = 255)
     private String descripcion;
@@ -51,16 +51,26 @@ public class CotizacionDetalle {
     @Column(name = "cantidad", nullable = false, precision = 12, scale = 2)
     private BigDecimal cantidad;
 
-    @Column(name = "precio_unitario", nullable = false, precision = 12, scale = 2)
-    private BigDecimal precioUnitario;
-
+    @Column(name = "precio_unitario_venta", nullable = false, precision = 12, scale = 2)
+    private BigDecimal precioUnitarioVenta = BigDecimal.ZERO;
+    
     @Column(name = "subtotal", nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
+    
+    @Column(name = "subtotal_venta", nullable = false, precision = 12, scale = 2)
+    private BigDecimal subtotalVenta = BigDecimal.ZERO;
+    
+    @Column(name = "precio_unitario_proveedor", precision = 12, scale = 2)
+    private BigDecimal precioUnitarioProveedor;
+
+    @Column(name = "precio_subtotal_proveedor", precision = 12, scale = 2)
+    private BigDecimal precioSubtotalProveedor;   
 
     @PrePersist
     protected void onCreate() {
         if (cantidad == null) cantidad = BigDecimal.ZERO;
-        if (precioUnitario == null) precioUnitario = BigDecimal.ZERO;
+        if (precioUnitarioVenta == null) precioUnitarioVenta = BigDecimal.ZERO;
+        if (subtotalVenta == null) subtotalVenta = BigDecimal.ZERO;
         if (subtotal == null) subtotal = BigDecimal.ZERO;
     }
 
@@ -81,8 +91,8 @@ public class CotizacionDetalle {
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
 
-    public String getSemana() { return semana; }
-    public void setSemana(String semana) { this.semana = semana; }
+    public Integer getSemana() { return semana; }
+    public void setSemana(Integer semana) { this.semana = semana; }
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
@@ -90,9 +100,41 @@ public class CotizacionDetalle {
     public BigDecimal getCantidad() { return cantidad; }
     public void setCantidad(BigDecimal cantidad) { this.cantidad = cantidad; }
 
-    public BigDecimal getPrecioUnitario() { return precioUnitario; }
-    public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
-
     public BigDecimal getSubtotal() { return subtotal; }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+
+    public BigDecimal getPrecioUnitarioProveedor() {
+        return precioUnitarioProveedor;
+    }
+
+    public void setPrecioUnitarioProveedor(BigDecimal precioUnitarioProveedor) {
+        this.precioUnitarioProveedor = precioUnitarioProveedor;
+    }
+
+    public BigDecimal getPrecioSubtotalProveedor() {
+        return precioSubtotalProveedor;
+    }
+
+    public void setPrecioSubtotalProveedor(BigDecimal precioSubtotalProveedor) {
+        this.precioSubtotalProveedor = precioSubtotalProveedor;
+    }
+
+    public BigDecimal getPrecioUnitarioVenta() {
+        return precioUnitarioVenta;
+    }
+
+    public void setPrecioUnitarioVenta(BigDecimal precioUnitarioVenta) {
+        this.precioUnitarioVenta = precioUnitarioVenta;
+    }
+
+    public BigDecimal getSubtotalVenta() {
+        return subtotalVenta;
+    }
+
+    public void setSubtotalVenta(BigDecimal subtotalVenta) {
+        this.subtotalVenta = subtotalVenta;
+    }
+    
+    
+    
 }

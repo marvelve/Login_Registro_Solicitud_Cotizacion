@@ -35,19 +35,6 @@ public class SolicitudServicios {
     @Column(name = "estado")
     private String estado;
 
-    // Relación 1 a 1 con cada posible detalle (solo 1 se usará según el servicio)
-    @OneToOne(mappedBy = "solicitudServicios", cascade = CascadeType.ALL)
-    private CotizacionObraBlanca cotizacionObraBlanca;
-
-    @OneToOne(mappedBy = "solicitudServicios", cascade = CascadeType.ALL)
-    private CotizacionCarpinteria cotizacionCarpinteria;
-
-    @OneToOne(mappedBy = "solicitudServicios", cascade = CascadeType.ALL)
-    private CotizacionVidrio cotizacionVidrio;
-
-    @OneToOne(mappedBy = "solicitudServicios", cascade = CascadeType.ALL)
-    private CotizacionMezon cotizacionMezon;
-
     // ---------- getters & setters ----------
 
     public Integer getIdSolicitudServicio() {
@@ -80,38 +67,6 @@ public class SolicitudServicios {
 
     public void setEstado(String estado) {
         this.estado = estado;
-    }
-
-    public CotizacionObraBlanca getCotizacionObraBlanca() {
-        return cotizacionObraBlanca;
-    }
-
-    public void setCotizacionObraBlanca(CotizacionObraBlanca cotizacionObraBlanca) {
-        this.cotizacionObraBlanca = cotizacionObraBlanca;
-    }
-
-    public CotizacionCarpinteria getCotizacionCarpinteria() {
-        return cotizacionCarpinteria;
-    }
-
-    public void setCotizacionCarpinteria(CotizacionCarpinteria cotizacionCarpinteria) {
-        this.cotizacionCarpinteria = cotizacionCarpinteria;
-    }
-
-    public CotizacionVidrio getCotizacionVidrio() {
-        return cotizacionVidrio;
-    }
-
-    public void setCotizacionVidrio(CotizacionVidrio cotizacionVidrio) {
-        this.cotizacionVidrio = cotizacionVidrio;
-    }
-
-    public CotizacionMezon getCotizacionMezon() {
-        return cotizacionMezon;
-    }
-
-    public void setCotizacionMezon(CotizacionMezon cotizacionMezon) {
-        this.cotizacionMezon = cotizacionMezon;
     }
 }
 

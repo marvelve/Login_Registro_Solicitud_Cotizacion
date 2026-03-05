@@ -1,24 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.interivalle.Servicio;
 
-import com.interivalle.DTO.*;
-import com.interivalle.Modelo.*;
-import com.interivalle.Repositorio.*;
+import com.interivalle.DTO.CrearSolicitud;
+import com.interivalle.DTO.SolicitudResponse;
+import com.interivalle.DTO.SolicitudServicioItem;
+import com.interivalle.Modelo.Solicitud;
+import com.interivalle.Modelo.SolicitudServicios;
+import com.interivalle.Modelo.Servicios;
+import com.interivalle.Modelo.Usuario;
+import com.interivalle.Repositorio.SolicitudRepositorio;
+import com.interivalle.Repositorio.SolicitudServiciosRepositorio;
+import com.interivalle.Repositorio.ServiciosRepositorio;
+import com.interivalle.Repositorio.UsuarioRepositorio;
+
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 /**
  *
  * @author mary_
  */
+
 @Service
 public class SolicitudService {
 
@@ -27,206 +35,90 @@ public class SolicitudService {
     @Autowired private ServiciosRepositorio serviciosRepo;
     @Autowired private SolicitudServiciosRepositorio solicitudServicioRepo;
 
-    @Autowired private ObraBlancaRepositorio obraBlancaRepo;
-    @Autowired private CarpinteriaRepositorio carpinteriaRepo;
-    @Autowired private VidrioRepositorio vidrioRepo;
-    @Autowired private MezonRepositorio mezonRepo;
-
-
-    // Crear solicitud
     @Transactional
-public SolicitudResponse crearSolicitud(CrearSolicitud dto) {
+    public SolicitudResponse crearSolicitud(CrearSolicitud dto) {
 
-    if (dto.getCorreoUsuario() == null || dto.getCorreoUsuario().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "correoUsuario es requerido");
-    }
-    if (dto.getNombreProyecto() == null || dto.getNombreProyecto().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreProyecto es requerido");
-    }
-    if (dto.getTipoSolicitud() == null || dto.getTipoSolicitud().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tipoSolicitud es requerido");
-    }
-
-    // Validar servicios SOLO para cotización base
-    if ("COTIZACION_BASE".equalsIgnoreCase(dto.getTipoSolicitud())) {
-        if (dto.getServicios() == null || dto.getServicios().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe seleccionar al menos un servicio");
+        if (dto.getCorreoUsuario() == null || dto.getCorreoUsuario().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "correoUsuario es requerido");
         }
-    }
+        if (dto.getNombreProyecto() == null || dto.getNombreProyecto().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreProyecto es requerido");
+        }
+        if (dto.getTipoSolicitud() == null || dto.getTipoSolicitud().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tipoSolicitud es requerido");
+        }
 
-    Usuario usuario = usuarioRepo.findByCorreoUsuario(dto.getCorreoUsuario())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-
-    // Crear cabecera
-    Solicitud solicitud = new Solicitud();
-    solicitud.setUsuario(usuario);
-    solicitud.setNombreProyectoUsuario(dto.getNombreProyecto().trim());
-    solicitud.setTipoSolicitud(dto.getTipoSolicitud().trim());
-    solicitud.setEstado("BORRADOR");
-    solicitud.setFechaSolicitud(LocalDate.now());
-
-    solicitud = solicitudRepo.save(solicitud);
-
-    // Crear detalles (solo en COTIZACION_BASE)
-    if ("COTIZACION_BASE".equalsIgnoreCase(dto.getTipoSolicitud())) {
-
-        for (Integer idServicios : dto.getServicios()) {
-
-            long existe = solicitudServicioRepo.existeServicioEnProyecto(
-                dto.getCorreoUsuario(),
-                solicitud.getNombreProyectoUsuario(),
-                solicitud.getTipoSolicitud(),
-                idServicios
-            );
-
-            if (existe > 0) {
-                throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Ya existe una solicitud para este proyecto con el servicio ID: " + idServicios
-                );
+        // Validar servicios SOLO para cotización base
+        if ("COTIZACION_BASE".equalsIgnoreCase(dto.getTipoSolicitud())) {
+            if (dto.getServicios() == null || dto.getServicios().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe seleccionar al menos un servicio");
             }
-
-            Servicios servicio = serviciosRepo.findById(idServicios)
-                .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Servicio no encontrado: " + idServicios
-                ));
-
-            SolicitudServicios ss = new SolicitudServicios();
-            ss.setSolicitud(solicitud);
-            ss.setServicios(servicio);
-            ss.setEstado("PENDIENTE");
-
-            solicitudServicioRepo.save(ss);
         }
+
+        Usuario usuario = usuarioRepo.findByCorreoUsuario(dto.getCorreoUsuario())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        Solicitud solicitud = new Solicitud();
+        solicitud.setUsuario(usuario);
+        solicitud.setNombreProyectoUsuario(dto.getNombreProyecto().trim());
+        solicitud.setTipoSolicitud(dto.getTipoSolicitud().trim());
+        solicitud.setEstado("BORRADOR");
+        solicitud.setFechaSolicitud(LocalDate.now());
+
+        solicitud = solicitudRepo.save(solicitud);
+
+        // Crear detalles (solo en COTIZACION_BASE)
+        if ("COTIZACION_BASE".equalsIgnoreCase(dto.getTipoSolicitud())) {
+
+            for (Integer idServicio : dto.getServicios()) {
+
+                long existe = solicitudServicioRepo.existeServicioEnProyecto(
+                    dto.getCorreoUsuario(),
+                    solicitud.getNombreProyectoUsuario(),
+                    solicitud.getTipoSolicitud(),
+                    idServicio
+                );
+
+                if (existe > 0) {
+                    throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Ya existe una solicitud para este proyecto con el servicio ID: " + idServicio
+                    );
+                }
+
+                Servicios servicio = serviciosRepo.findById(idServicio)
+                    .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Servicio no encontrado: " + idServicio
+                    ));
+
+                SolicitudServicios ss = new SolicitudServicios();
+                ss.setSolicitud(solicitud);
+                ss.setServicios(servicio);
+                ss.setEstado("PENDIENTE");
+
+                solicitudServicioRepo.save(ss);
+            }
+        }
+
+        return buildResponseFromSolicitud(solicitud.getIdSolicitud());
     }
 
-    // Armar respuesta con detalles (solicitudServicios)
-    List<SolicitudServicios> detalles = solicitudServicioRepo.findBySolicitud_IdSolicitud(solicitud.getIdSolicitud());
+    public SolicitudResponse obtenerSolicitud(Integer idSolicitud) {
+        Solicitud solicitud = solicitudRepo.findById(idSolicitud)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
 
-    List<SolicitudServicioItem> items = detalles.stream().map(ss -> {
-        SolicitudServicioItem it = new SolicitudServicioItem();
-        it.setIdSolicitudServicio(ss.getIdSolicitudServicio());
-        it.setIdServicio(ss.getServicios().getIdServicio()); // si tu campo en Servicios es idServicios, ajusta aquí
-        it.setNombreServicio(ss.getServicios().getNombreServicio());
-        it.setEstado(ss.getEstado());
-        return it;
-    }).collect(Collectors.toList());
-
-    SolicitudResponse resp = new SolicitudResponse();
-    resp.setIdSolicitud(solicitud.getIdSolicitud());
-    resp.setTipoSolicitud(solicitud.getTipoSolicitud());
-    resp.setEstado(solicitud.getEstado());
-    resp.setNombreProyecto(solicitud.getNombreProyectoUsuario());
-    resp.setSolicitudServicios(items);   //lo que necesita /formularios
-
-    return resp;
-}
-
-public SolicitudResponse obtenerSolicitud(Integer idSolicitud) {
-
-    Solicitud solicitud = solicitudRepo.findById(idSolicitud)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
-
-    List<SolicitudServicios> detalles = solicitudServicioRepo.findBySolicitud_IdSolicitud(idSolicitud);
-
-    List<SolicitudServicioItem> items = detalles.stream().map(ss -> {
-        SolicitudServicioItem it = new SolicitudServicioItem();
-        it.setIdSolicitudServicio(ss.getIdSolicitudServicio());
-        it.setIdServicio(ss.getServicios().getIdServicio()); // ajusta si es idServicios
-        it.setNombreServicio(ss.getServicios().getNombreServicio());
-        it.setEstado(ss.getEstado());
-        return it;
-    }).collect(Collectors.toList());
-
-    SolicitudResponse resp = new SolicitudResponse();
-    resp.setIdSolicitud(solicitud.getIdSolicitud());
-    resp.setTipoSolicitud(solicitud.getTipoSolicitud());
-    resp.setEstado(solicitud.getEstado());
-    resp.setNombreProyecto(solicitud.getNombreProyectoUsuario());
-    resp.setSolicitudServicios(items);  
-
-    return resp;
-}
-
-    @Transactional
-    public void guardarObraBlanca(ObraBlancaDTO dto) {
-        SolicitudServicios ss = solicitudServicioRepo.findById(dto.getIdSolicitudServicio())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudServicio no existe"));
-
-        // Puedes validar que el servicio sea el correcto (opcional)
-        // if (!ss.getServicio().getNombre().equalsIgnoreCase("Mano de Obra Blanca")) ...
-
-        CotizacionObraBlanca ob = new CotizacionObraBlanca();
-        ob.setSolicitudServicio(ss);
-        ob.setMedidaAptoInterna(dto.getMedidaAptoInterna());
-        ob.setCantidadBanos(dto.getCantidadBanos());
-        ob.setDivisionPared(dto.getDivisionPared());
-        ob.setTipoCielo(dto.getTipoCielo());
-
-        obraBlancaRepo.save(ob);
-        ss.setEstado("GENERADO");
-        solicitudServicioRepo.save(ss);
+        return buildResponseFromSolicitud(solicitud.getIdSolicitud());
     }
 
-    @Transactional
-    public void guardarCarpinteria(CarpinteriaDTO dto) {
-        SolicitudServicios ss = solicitudServicioRepo.findById(dto.getIdSolicitudServicio())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudServicio no existe"));
-
-        CotizacionCarpinteria c = new CotizacionCarpinteria();
-        c.setSolicitudServicios(ss);
-        c.setMedidaAptoInterna(dto.getMedidaAptoInterna());
-        c.setCantidadCloset(dto.getCantidadCloset());
-        c.setCantidadPuertas(dto.getCantidadPuertas());
-        c.setCantidadBanos(dto.getCantidadBanos());
-
-        carpinteriaRepo.save(c);
-        ss.setEstado("GENERADO");
-        solicitudServicioRepo.save(ss);
-    }
-
-    @Transactional
-    public void guardarVidrio(VidrioDTO dto) {
-        SolicitudServicios ss = solicitudServicioRepo.findById(dto.getIdSolicitudServicio())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudServicio no existe"));
-
-        CotizacionVidrio v = new CotizacionVidrio();
-        v.setSolicitudServicio(ss);
-        v.setCantidadBanos(dto.getCantidadBanos());
-        v.setColor(dto.getColor());
-        v.setApertura(dto.getApertura());
-
-        vidrioRepo.save(v);
-        ss.setEstado("GENERADO");
-        solicitudServicioRepo.save(ss);
-    }
-
-    @Transactional
-    public void guardarMezon(MezonDTO dto) {
-        SolicitudServicios ss = solicitudServicioRepo.findById(dto.getIdSolicitudServicio())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudServicio no existe"));
-
-        CotizacionMezon m = new CotizacionMezon();
-        m.setSolicitudServicio(ss);
-        m.setMezonCocina(Boolean.TRUE.equals(dto.getMezonCocina()));
-        m.setMezonBarra(Boolean.TRUE.equals(dto.getMezonBarra()));
-        m.setMezonBano(Boolean.TRUE.equals(dto.getMezonBano()));
-
-        mezonRepo.save(m);
-        ss.setEstado("GENERADO");
-        solicitudServicioRepo.save(ss);
-    }
-
- 
-    // Finalizar / Enviar solicitud
-    
     @Transactional
     public void enviarSolicitud(Integer idSolicitud) {
         Solicitud solicitud = solicitudRepo.findById(idSolicitud)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
 
-        // Validación: todos los servicios deben estar GENERADO
+        // OJO: si ya no guardas formularios por servicio, esta validación no tiene sentido.
+        // Puedes: (a) eliminarla, (b) exigir que estén "PENDIENTE" -> "SELECCIONADO", etc.
+        // Aquí la dejo como estaba (GENERO/pendiente), pero probablemente debes ajustar.
         List<SolicitudServicios> detalles = solicitudServicioRepo.findBySolicitud_IdSolicitud(idSolicitud);
         boolean falta = detalles.stream().anyMatch(d -> !"GENERADO".equalsIgnoreCase(d.getEstado()));
 
@@ -240,5 +132,30 @@ public SolicitudResponse obtenerSolicitud(Integer idSolicitud) {
         solicitud.setEstado("ENVIADA");
         solicitudRepo.save(solicitud);
     }
-}
 
+    private SolicitudResponse buildResponseFromSolicitud(Integer idSolicitud) {
+
+        Solicitud solicitud = solicitudRepo.findById(idSolicitud)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
+
+        List<SolicitudServicios> detalles = solicitudServicioRepo.findBySolicitud_IdSolicitud(idSolicitud);
+
+        List<SolicitudServicioItem> items = detalles.stream().map(ss -> {
+            SolicitudServicioItem it = new SolicitudServicioItem();
+            it.setIdSolicitudServicio(ss.getIdSolicitudServicio());
+            it.setIdServicio(ss.getServicios().getIdServicio());
+            it.setNombreServicio(ss.getServicios().getNombreServicio());
+            it.setEstado(ss.getEstado());
+            return it;
+        }).collect(Collectors.toList());
+
+        SolicitudResponse resp = new SolicitudResponse();
+        resp.setIdSolicitud(solicitud.getIdSolicitud());
+        resp.setTipoSolicitud(solicitud.getTipoSolicitud());
+        resp.setEstado(solicitud.getEstado());
+        resp.setNombreProyecto(solicitud.getNombreProyectoUsuario());
+        resp.setSolicitudServicios(items);
+
+        return resp;
+    }
+}

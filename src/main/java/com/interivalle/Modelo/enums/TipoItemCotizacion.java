@@ -13,7 +13,7 @@ package com.interivalle.Modelo.enums;
  */
 public enum TipoItemCotizacion {
 
-    MANO_OBRA,
+    ACTIVIDAD,
     MATERIAL,
     PRODUCTO;
 
