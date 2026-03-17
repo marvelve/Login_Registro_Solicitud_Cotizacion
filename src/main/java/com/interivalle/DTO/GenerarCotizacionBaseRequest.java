@@ -4,6 +4,7 @@
  */
 package com.interivalle.DTO;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 /**
  *
@@ -14,34 +15,58 @@ import jakarta.validation.constraints.NotNull;
 
 public class GenerarCotizacionBaseRequest {
 
-    @NotNull
+    @NotNull(message = "La solicitud es obligatoria")
     private Integer solicitudId;
 
-    // Campos compartidos / base
-    private Double medidaAptoInterna;
+    @Valid
+    private ManoObraBaseRequest manoObra;
 
-    // Ejemplos (ajusta a tus forms reales)
-    private Boolean divisionPared;
-    private String tipoCielo;
+    @Valid
+    private CarpinteriaBaseRequest carpinteria;
 
-    private Integer cantidadCloset;
-    private Integer cantidadPuertas;
+    @Valid
+    private VidrioBaseRequest vidrio;
 
-    public Integer getSolicitudId() { return solicitudId; }
-    public void setSolicitudId(Integer solicitudId) { this.solicitudId = solicitudId; }
+    @Valid
+    private MezonBaseRequest mezon;
 
-    public Double getMedidaAptoInterna() { return medidaAptoInterna; }
-    public void setMedidaAptoInterna(Double medidaAptoInterna) { this.medidaAptoInterna = medidaAptoInterna; }
+    public Integer getSolicitudId() {
+        return solicitudId;
+    }
 
-    public Boolean getDivisionPared() { return divisionPared; }
-    public void setDivisionPared(Boolean divisionPared) { this.divisionPared = divisionPared; }
+    public void setSolicitudId(Integer solicitudId) {
+        this.solicitudId = solicitudId;
+    }
 
-    public String getTipoCielo() { return tipoCielo; }
-    public void setTipoCielo(String tipoCielo) { this.tipoCielo = tipoCielo; }
+    public ManoObraBaseRequest getManoObra() {
+        return manoObra;
+    }
 
-    public Integer getCantidadCloset() { return cantidadCloset; }
-    public void setCantidadCloset(Integer cantidadCloset) { this.cantidadCloset = cantidadCloset; }
+    public void setManoObra(ManoObraBaseRequest manoObra) {
+        this.manoObra = manoObra;
+    }
 
-    public Integer getCantidadPuertas() { return cantidadPuertas; }
-    public void setCantidadPuertas(Integer cantidadPuertas) { this.cantidadPuertas = cantidadPuertas; }
+    public CarpinteriaBaseRequest getCarpinteria() {
+        return carpinteria;
+    }
+
+    public void setCarpinteria(CarpinteriaBaseRequest carpinteria) {
+        this.carpinteria = carpinteria;
+    }
+
+    public VidrioBaseRequest getVidrio() {
+        return vidrio;
+    }
+
+    public void setVidrio(VidrioBaseRequest vidrio) {
+        this.vidrio = vidrio;
+    }
+
+    public MezonBaseRequest getMezon() {
+        return mezon;
+    }
+
+    public void setMezon(MezonBaseRequest mezon) {
+        this.mezon = mezon;
+    }
 }

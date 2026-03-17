@@ -26,7 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
  *
  * @author mary_
  */
-
 @Service
 public class SolicitudService {
 
@@ -62,7 +61,7 @@ public class SolicitudService {
         solicitud.setUsuario(usuario);
         solicitud.setNombreProyectoUsuario(dto.getNombreProyecto().trim());
         solicitud.setTipoSolicitud(dto.getTipoSolicitud().trim());
-        solicitud.setEstado("BORRADOR");
+        solicitud.setEstado("PENDIENTE");
         solicitud.setFechaSolicitud(LocalDate.now());
 
         solicitud = solicitudRepo.save(solicitud);
@@ -112,25 +111,68 @@ public class SolicitudService {
     }
 
     @Transactional
-    public void enviarSolicitud(Integer idSolicitud) {
+
+    public SolicitudResponse generarCotizacion(Integer idSolicitud) {
         Solicitud solicitud = solicitudRepo.findById(idSolicitud)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
 
-        // OJO: si ya no guardas formularios por servicio, esta validación no tiene sentido.
-        // Puedes: (a) eliminarla, (b) exigir que estén "PENDIENTE" -> "SELECCIONADO", etc.
-        // Aquí la dejo como estaba (GENERO/pendiente), pero probablemente debes ajustar.
-        List<SolicitudServicios> detalles = solicitudServicioRepo.findBySolicitud_IdSolicitud(idSolicitud);
-        boolean falta = detalles.stream().anyMatch(d -> !"GENERADO".equalsIgnoreCase(d.getEstado()));
-
-        if (falta) {
+        if (!"PENDIENTE".equalsIgnoreCase(solicitud.getEstado())) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
-                "Faltan formularios por completar (al menos un servicio está PENDIENTE)"
+                "Solo se puede generar cotización para solicitudes en estado PENDIENTE"
             );
         }
 
-        solicitud.setEstado("ENVIADA");
-        solicitudRepo.save(solicitud);
+        solicitud.setEstado("GENERADA");
+        solicitud = solicitudRepo.save(solicitud);
+
+        return buildResponseFromSolicitud(solicitud.getIdSolicitud());
+    }
+
+    private SolicitudResponse toResponse(Solicitud solicitud) {
+
+        SolicitudResponse dto = new SolicitudResponse();
+
+        dto.setIdSolicitud(solicitud.getIdSolicitud());
+        dto.setTipoSolicitud(solicitud.getTipoSolicitud());
+        dto.setEstado(solicitud.getEstado());
+        dto.setNombreProyecto(solicitud.getNombreProyectoUsuario());
+        dto.setFechaSolicitud(solicitud.getFechaSolicitud());
+
+        if (solicitud.getUsuario() != null) {
+            dto.setCorreoUsuario(solicitud.getUsuario().getCorreoUsuario());
+        }
+
+        if (solicitud.getServiciosSeleccionados() != null && !solicitud.getServiciosSeleccionados().isEmpty()) {
+            List<SolicitudServicioItem> servicios = solicitud.getServiciosSeleccionados()
+                .stream()
+                .map(item -> {
+                    SolicitudServicioItem dtoItem = new SolicitudServicioItem();
+                    dtoItem.setIdServicio(item.getServicios().getIdServicio());
+                    dtoItem.setNombreServicio(item.getServicios().getNombreServicio());
+                    dtoItem.setEstado(item.getEstado());
+                    return dtoItem;
+                })
+                .collect(Collectors.toList());
+
+            dto.setSolicitudServicios(servicios);
+        }
+
+        return dto;
+    }
+
+    public List<SolicitudResponse> listarTodas() {
+        return solicitudRepo.findAll()
+            .stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
+    }
+
+    public List<SolicitudResponse> listarPorCorreoUsuario(String correoUsuario) {
+        return solicitudRepo.findByUsuarioCorreoUsuario(correoUsuario)
+            .stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
     }
 
     private SolicitudResponse buildResponseFromSolicitud(Integer idSolicitud) {
@@ -154,6 +196,12 @@ public class SolicitudService {
         resp.setTipoSolicitud(solicitud.getTipoSolicitud());
         resp.setEstado(solicitud.getEstado());
         resp.setNombreProyecto(solicitud.getNombreProyectoUsuario());
+        resp.setFechaSolicitud(solicitud.getFechaSolicitud());
+
+        if (solicitud.getUsuario() != null) {
+            resp.setCorreoUsuario(solicitud.getUsuario().getCorreoUsuario());
+        }
+
         resp.setSolicitudServicios(items);
 
         return resp;

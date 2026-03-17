@@ -10,6 +10,8 @@ import com.interivalle.Servicio.AdminUsuarioServicio;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 /**
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/usuarios")
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class AdminUsuarioControler {
 
     private final AdminUsuarioServicio adminService;
@@ -28,8 +30,15 @@ public class AdminUsuarioControler {
         this.adminService = adminService;
     }
 
-    @GetMapping
-    public List<UsuarioResponse> listar(@RequestParam(required = false) Boolean estado) {
+     @PostMapping
+     public ResponseEntity<UsuarioResponse> crearUsuario(@Valid @RequestBody UsuarioCreateRequest dto) {
+        Usuario usuario = adminService.crearUsuario(dto);
+        UsuarioResponse response = adminService.toResponseDTO(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+   @GetMapping
+    public ResponseEntity<List<UsuarioResponse>> listar(@RequestParam(required = false) Boolean estado) {
 
     List<Usuario> usuarios;
 
@@ -39,10 +48,16 @@ public class AdminUsuarioControler {
         usuarios = adminService.listarTodos();
     }
 
-    return usuarios.stream()
+    List<UsuarioResponse> response = usuarios.stream()
             .map(adminService::toResponseDTO)
             .collect(Collectors.toList());
-    }
+
+    int total = response.size();
+
+    return ResponseEntity.ok()
+            .header("Content-Range", "usuarios 0-" + (total > 0 ? total - 1 : 0) + "/" + total)
+            .body(response);
+}
 
 
     @GetMapping("/{id}")

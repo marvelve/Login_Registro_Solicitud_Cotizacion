@@ -45,6 +45,7 @@ public class CrearCotizacionRequest {
         private String categoria;
         private Integer semana;
         private String descripcion;
+        private String actividadMaterial;
 
         @NotNull
         private BigDecimal cantidad;
@@ -72,5 +73,15 @@ public class CrearCotizacionRequest {
 
         public BigDecimal getPrecioUnitario() { return precioUnitario; }
         public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
+
+        public String getActividadMaterial() {
+            return actividadMaterial;
+        }
+
+        public void setActividadMaterial(String actividadMaterial) {
+            this.actividadMaterial = actividadMaterial;
+        }
+        
+        
     }
 }

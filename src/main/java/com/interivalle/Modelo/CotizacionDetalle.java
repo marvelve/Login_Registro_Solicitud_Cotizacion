@@ -41,11 +41,14 @@ public class CotizacionDetalle {
     private String categoria;
 
     // Solo aplica a Obra Blanca si quieres (SEMANA 1, SEMANA 2...)
-    @Column(name = "semana", length = 50)
+    @Column(name = "semana")
     private Integer semana;
 
     @Column(name = "descripcion", length = 255)
     private String descripcion;
+    
+    @Column(name = "actividad_material", length = 150)
+    private String actividadMaterial;
 
     // Cantidad decimal (en vidrio y mesón hay 1.20, 1.50, etc.)
     @Column(name = "cantidad", nullable = false, precision = 12, scale = 2)
@@ -54,24 +57,21 @@ public class CotizacionDetalle {
     @Column(name = "precio_unitario_venta", nullable = false, precision = 12, scale = 2)
     private BigDecimal precioUnitarioVenta = BigDecimal.ZERO;
     
-    @Column(name = "subtotal", nullable = false, precision = 12, scale = 2)
-    private BigDecimal subtotal;
-    
     @Column(name = "subtotal_venta", nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotalVenta = BigDecimal.ZERO;
     
     @Column(name = "precio_unitario_proveedor", precision = 12, scale = 2)
     private BigDecimal precioUnitarioProveedor;
 
-    @Column(name = "precio_subtotal_proveedor", precision = 12, scale = 2)
-    private BigDecimal precioSubtotalProveedor;   
+    @Column(name = "subtotal_proveedor", precision = 12, scale = 2)
+    private BigDecimal SubtotalProveedor;   
 
     @PrePersist
     protected void onCreate() {
         if (cantidad == null) cantidad = BigDecimal.ZERO;
         if (precioUnitarioVenta == null) precioUnitarioVenta = BigDecimal.ZERO;
         if (subtotalVenta == null) subtotalVenta = BigDecimal.ZERO;
-        if (subtotal == null) subtotal = BigDecimal.ZERO;
+        if (SubtotalProveedor == null) SubtotalProveedor = BigDecimal.ZERO;
     }
 
     // -------- Getters / Setters --------
@@ -100,23 +100,29 @@ public class CotizacionDetalle {
     public BigDecimal getCantidad() { return cantidad; }
     public void setCantidad(BigDecimal cantidad) { this.cantidad = cantidad; }
 
-    public BigDecimal getSubtotal() { return subtotal; }
-    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+    public String getActividadMaterial() {
+        return actividadMaterial;
+    }
 
+    public void setActividadMaterial(String actividadMaterial) {
+        this.actividadMaterial = actividadMaterial;
+    }
+
+    public BigDecimal getSubtotalProveedor() {
+        return SubtotalProveedor;
+    }
+
+    public void setSubtotalProveedor(BigDecimal SubtotalProveedor) {
+        this.SubtotalProveedor = SubtotalProveedor;
+    }
+
+    
     public BigDecimal getPrecioUnitarioProveedor() {
         return precioUnitarioProveedor;
     }
 
     public void setPrecioUnitarioProveedor(BigDecimal precioUnitarioProveedor) {
         this.precioUnitarioProveedor = precioUnitarioProveedor;
-    }
-
-    public BigDecimal getPrecioSubtotalProveedor() {
-        return precioSubtotalProveedor;
-    }
-
-    public void setPrecioSubtotalProveedor(BigDecimal precioSubtotalProveedor) {
-        this.precioSubtotalProveedor = precioSubtotalProveedor;
     }
 
     public BigDecimal getPrecioUnitarioVenta() {
@@ -134,7 +140,6 @@ public class CotizacionDetalle {
     public void setSubtotalVenta(BigDecimal subtotalVenta) {
         this.subtotalVenta = subtotalVenta;
     }
-    
     
     
 }

@@ -44,12 +44,6 @@ public class AuthServicio {
         u.setCelularUsuario(dto.getCelularUsuario());
         u.setCiudadUsuario(dto.getCiudadUsuario());
 
-
-        // si no mandan idRol -> queda 3 (CLIENTE)
-        if (dto.getIdRol() != null) {
-            u.setIdRol(dto.getIdRol());
-        }
-
         usuarioRepo.save(u);
     }
 

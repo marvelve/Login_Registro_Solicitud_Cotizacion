@@ -4,6 +4,7 @@
  */
 package com.interivalle.Modelo;
 
+import com.interivalle.DTO.SolicitudServicioItem;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ public class Solicitud {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idSolicitud;
-
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
@@ -35,18 +35,21 @@ public class Solicitud {
     @Column(name = "tipo_solicitud", nullable = false)
     private String tipoSolicitud;
 
-    // "BORRADOR" | "ENVIADA" | "APROBADA" | "RECHAZADA"
+    // "PENDIENTE" | "GENERADA"
     @Column(name = "estado", nullable = false)
     private String estado;
 
     @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SolicitudServicios> serviciosSeleccionados = new ArrayList<>();
 
-    // Si aún vas a manejar VisitaTecnica en otra tabla:
-   // @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-   // private VisitaTecnica visitaTecnica;
-
     // ---------- getters & setters ----------
+    
+      public List<SolicitudServicios> getServiciosSeleccionados() {
+        return serviciosSeleccionados;
+    }
+    public void setServiciosSeleccionados(List<SolicitudServicios> serviciosSeleccionados) {
+        this.serviciosSeleccionados = serviciosSeleccionados;
+    }
 
     public Integer getIdSolicitud() {
         return idSolicitud;
@@ -96,13 +99,6 @@ public class Solicitud {
         this.estado = estado;
     }
 
-    public List<SolicitudServicios> getServiciosSeleccionados() {
-        return serviciosSeleccionados;
-    }
-
-    public void setServiciosSeleccionados(List<SolicitudServicios> serviciosSeleccionados) {
-        this.serviciosSeleccionados = serviciosSeleccionados;
-    }
-
+    
 }
 

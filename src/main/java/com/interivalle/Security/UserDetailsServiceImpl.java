@@ -29,9 +29,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // Convertimos idRol a ROLE_...
         String role = switch (u.getIdRol()) {
-            case 1 -> "ROLE_ADMIN";
-            case 2 -> "ROLE_SUPERVISOR";
-            default -> "ROLE_CLIENTE";
+            case 1 -> "ADMIN";
+            case 2 -> "SUPERVISOR";
+            case 3 -> "CLIENTE";
+            default -> throw new UsernameNotFoundException("Rol inválido");
         };
 
         return new org.springframework.security.core.userdetails.User(

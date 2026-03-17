@@ -8,9 +8,12 @@ import com.interivalle.DTO.*;
 import com.interivalle.Modelo.Usuario;
 import com.interivalle.Repositorio.UsuarioRepositorio;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  *
  * @author mary_
@@ -20,6 +23,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class AdminUsuarioServicio {
 
     private final UsuarioRepositorio usuarioRepo;
+   // @Autowired
+   // private RolRepositorio rolRepositorio;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public AdminUsuarioServicio(UsuarioRepositorio usuarioRepo) {
         this.usuarioRepo = usuarioRepo;
@@ -33,6 +41,44 @@ public class AdminUsuarioServicio {
     return usuarioRepo.findByEstadoUsuario(estado);
 }
 
+        public Usuario crearUsuario(UsuarioCreateRequest dto) {
+
+        Optional<Usuario> existente = usuarioRepo.findByCorreoUsuario(dto.getCorreoUsuario());
+        if (existente.isPresent()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "El correo ya está registrado"
+            );
+        }
+       /* Rol rol = rolRepositorio.findById(dto.getIdRol())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Rol no encontrado"
+            ));*/
+
+        Usuario usuario = new Usuario();
+        usuario.setNombreUsuario(dto.getNombreUsuario());
+        usuario.setCorreoUsuario(dto.getCorreoUsuario());
+        usuario.setContrasenaUsuario(passwordEncoder.encode(dto.getContrasenaUsuario()));
+        usuario.setCelularUsuario(dto.getCelularUsuario());
+        usuario.setCiudadUsuario(dto.getCiudadUsuario());
+        // si no mandan idRol -> queda 3 (CLIENTE)
+        if (dto.getIdRol() == null) {
+             usuario.setIdRol(3);
+        } else {
+            usuario.setIdRol(dto.getIdRol());
+            }
+       // usuario.setRol(rol);
+
+        // si manejas estado por defecto
+        usuario.setEstadoUsuario(true);
+
+        return usuarioRepo.save(usuario);
+    }
+    
+    
+    
+    
 
     public Usuario buscarPorId(Integer id) {
         return usuarioRepo.findById(id)

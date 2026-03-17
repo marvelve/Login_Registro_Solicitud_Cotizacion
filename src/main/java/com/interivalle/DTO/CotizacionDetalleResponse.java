@@ -10,7 +10,6 @@ import java.math.BigDecimal;
  *
  * @author mary_
  */
-
 public class CotizacionDetalleResponse {
 
     private Integer idDetalle;
@@ -21,38 +20,118 @@ public class CotizacionDetalleResponse {
     private String categoria;
     private Integer semana;
     private String descripcion;
+    private String actividadMaterial;
 
     private BigDecimal cantidad;
-    private BigDecimal precioUnitario;
-    private BigDecimal subtotal;
+    private BigDecimal precioUnitarioVenta;
+    private BigDecimal subtotalVenta;
 
-    public Integer getIdDetalle() { return idDetalle; }
-    public void setIdDetalle(Integer idDetalle) { this.idDetalle = idDetalle; }
+    private BigDecimal precioUnitarioProveedor;
+    private BigDecimal subtotalProveedor;
 
-    public Integer getServicioId() { return servicioId; }
-    public void setServicioId(Integer servicioId) { this.servicioId = servicioId; }
+    public Integer getIdDetalle() {
+        return idDetalle;
+    }
 
-    public String getNombreServicio() { return nombreServicio; }
-    public void setNombreServicio(String nombreServicio) { this.nombreServicio = nombreServicio; }
+    public void setIdDetalle(Integer idDetalle) {
+        this.idDetalle = idDetalle;
+    }
 
-    public TipoItemCotizacion getTipoItem() { return tipoItem; }
-    public void setTipoItem(TipoItemCotizacion tipoItem) { this.tipoItem = tipoItem; }
+    public Integer getServicioId() {
+        return servicioId;
+    }
 
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public void setServicioId(Integer servicioId) {
+        this.servicioId = servicioId;
+    }
 
-    public Integer getSemana() { return semana; }
-    public void setSemana(Integer semana) { this.semana = semana; }
+    public String getNombreServicio() {
+        return nombreServicio;
+    }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setNombreServicio(String nombreServicio) {
+        this.nombreServicio = nombreServicio;
+    }
 
-    public BigDecimal getCantidad() { return cantidad; }
-    public void setCantidad(BigDecimal cantidad) { this.cantidad = cantidad; }
+    public TipoItemCotizacion getTipoItem() {
+        return tipoItem;
+    }
 
-    public BigDecimal getPrecioUnitario() { return precioUnitario; }
-    public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
+    public void setTipoItem(TipoItemCotizacion tipoItem) {
+        this.tipoItem = tipoItem;
+    }
 
-    public BigDecimal getSubtotal() { return subtotal; }
-    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public Integer getSemana() {
+        return semana;
+    }
+
+    public void setSemana(Integer semana) {
+        this.semana = semana;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public BigDecimal getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(BigDecimal cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public BigDecimal getPrecioUnitarioVenta() {
+        return precioUnitarioVenta;
+    }
+
+    public void setPrecioUnitarioVenta(BigDecimal precioUnitarioVenta) {
+        this.precioUnitarioVenta = precioUnitarioVenta;
+    }
+
+    public BigDecimal getSubtotalVenta() {
+        return subtotalVenta;
+    }
+
+    public void setSubtotalVenta(BigDecimal subtotalVenta) {
+        this.subtotalVenta = subtotalVenta;
+    }
+
+    public BigDecimal getPrecioUnitarioProveedor() {
+        return precioUnitarioProveedor;
+    }
+
+    public void setPrecioUnitarioProveedor(BigDecimal precioUnitarioProveedor) {
+        this.precioUnitarioProveedor = precioUnitarioProveedor;
+    }
+
+    public BigDecimal getSubtotalProveedor() {
+        return subtotalProveedor;
+    }
+
+    public void setSubtotalProveedor(BigDecimal subtotalProveedor) {
+        this.subtotalProveedor = subtotalProveedor;
+    }
+
+    public String getActividadMaterial() {
+        return actividadMaterial;
+    }
+
+    public void setActividadMaterial(String actividadMaterial) {
+        this.actividadMaterial = actividadMaterial;
+    }
+    
+    
 }

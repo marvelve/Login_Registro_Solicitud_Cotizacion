@@ -4,26 +4,23 @@
  */
 package com.interivalle.DTO;
 
+import jakarta.validation.constraints.NotNull;
+
 /**
  *
  * @author mary_
  */
 
-public class MezonDTO {
+public class MezonBaseRequest {
 
-    private Integer idSolicitudServicio;
-
+     @NotNull(message = "Debe indicar si desea mesón de cocina")
     private Boolean mezonCocina;
+
+    @NotNull(message = "Debe indicar si desea mesón barra")
     private Boolean mezonBarra;
-    private Boolean mezonBano;
 
-    public Integer getIdSolicitudServicio() {
-        return idSolicitudServicio;
-    }
-
-    public void setIdSolicitudServicio(Integer idSolicitudServicio) {
-        this.idSolicitudServicio = idSolicitudServicio;
-    }
+    @NotNull(message = "Debe indicar si desea mesón lavamanos")
+    private Boolean mezonLavamanos;
 
     public Boolean getMezonCocina() {
         return mezonCocina;
@@ -41,12 +38,11 @@ public class MezonDTO {
         this.mezonBarra = mezonBarra;
     }
 
-    public Boolean getMezonBano() {
-        return mezonBano;
+    public Boolean getMezonLavamanos() {
+        return mezonLavamanos;
     }
 
-    public void setMezonBano(Boolean mezonBano) {
-        this.mezonBano = mezonBano;
+    public void setMezonLavamanos(Boolean mezonLavamanos) {
+        this.mezonLavamanos = mezonLavamanos;
     }
 }
-

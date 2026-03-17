@@ -4,6 +4,7 @@
  */
 package com.interivalle.Modelo;
 
+
 import com.interivalle.Modelo.enums.TipoItemCotizacion;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -12,7 +13,6 @@ import java.time.LocalDate;
  *
  * @author mary_
  */
-
 
 @Entity
 @Table(name = "catalogo_item")
@@ -23,61 +23,85 @@ public class CatalogoItem {
     @Column(name = "id_catalogo_item")
     private Integer idCatalogoItem;
 
-    // Relación con servicios (Obra Blanca, Carpintería, etc.)
+    // Relación con servicio: Obra Blanca, Carpintería, Vidrio, Mesón, etc.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_servicio")
     private Servicios servicio;
 
+    // ACTIVIDAD | MATERIAL | PRODUCTO
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_item", nullable = false)
+    @Column(name = "tipo_item", nullable = false, length = 30)
     private TipoItemCotizacion tipoItem;
 
-    @Column(name = "categoria")
+    // Código interno único para evitar depender del nombre visible
+    // Ejemplo: ACT_DETALLE_PINTURA, MAT_SUPERBOARD_6MM
+    @Column(name = "codigo", nullable = false, unique = true, length = 100)
+    private String codigo;
+
+    // Grupo o familia visual
+    // Ejemplo: MANO DE OBRA, MATERIALES, ELECTRICOS
+    @Column(name = "categoria", length = 100)
     private String categoria;
 
-    @Column(name = "nombre_item")
+    // Nombre visible
+    @Column(name = "nombre_item", nullable = false, length = 150)
     private String nombreItem;
 
-    @Column(name = "descripcion")
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
 
-    @Column(name = "unidad")
+    // unidad: M2, UND, ML, GLOBAL, KIT, etc.
+    @Column(name = "unidad", length = 50)
     private String unidad;
 
-    @Column(name = "modo_precio")
-    private String modoPrecio; // FIJO | FORMULA | EXTERNO
+    // FIJO | FORMULA | EXTERNO
+    @Column(name = "modo_precio", length = 30)
+    private String modoPrecio;
 
-    @Column(name = "precio_unitario_venta")
+    // Precio de venta unitario vigente
+    @Column(name = "precio_unitario_venta", precision = 12, scale = 2)
     private BigDecimal precioUnitarioVenta;
 
-    @Column(name = "precio_unitario_proveedor")
+    // Precio de proveedor unitario vigente
+    @Column(name = "precio_unitario_proveedor", precision = 12, scale = 2)
     private BigDecimal precioUnitarioProveedor;
 
-    @Column(name = "precio_subtotal_venta")
-    private BigDecimal precioSubtotalVenta;
-
-    @Column(name = "formula_code")
+    // Código de fórmula para cálculo genérico desde backend
+    // Ejemplo: FIJO, AREA_PRIVADA_X_FACTOR_X_PRECIO, CANTIDAD_BANOS_X_PRECIO
+    @Column(name = "formula_code", length = 80)
     private String formulaCode;
 
+    // Parámetros flexibles para fórmulas
+    // Ejemplo: {"factor":3,"campoEntrada":"medidaAreaPrivada"}
     @Column(name = "params_json", columnDefinition = "TEXT")
     private String paramsJson;
 
+    // Factor principal para simplificar fórmulas frecuentes
+    @Column(name = "factor", precision = 12, scale = 4)
+    private BigDecimal factor;
+
+    // Orden para mostrar en tablas o generar cotización
+    @Column(name = "orden")
+    private Integer orden;
+
+    // Semana sugerida para actividades o materiales
+    @Column(name = "semana")
+    private Integer semana;
+
+    // Vigencia del precio/configuración
     @Column(name = "vigente_desde")
     private LocalDate vigenteDesde;
 
     @Column(name = "vigente_hasta")
     private LocalDate vigenteHasta;
 
-    @Column(name = "activo")
+    @Column(name = "activo", nullable = false)
     private Boolean activo = true;
 
     @Column(name = "creado_por")
     private Integer creadoPor;
-    
-    @Column(name = "semana", nullable = false)
-    private Integer semana;
 
-    // ================= GETTERS & SETTERS =================
+    // ===================== GETTERS & SETTERS =====================
 
     public Integer getIdCatalogoItem() {
         return idCatalogoItem;
@@ -101,6 +125,14 @@ public class CatalogoItem {
 
     public void setTipoItem(TipoItemCotizacion tipoItem) {
         this.tipoItem = tipoItem;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public String getCategoria() {
@@ -159,14 +191,6 @@ public class CatalogoItem {
         this.precioUnitarioProveedor = precioUnitarioProveedor;
     }
 
-    public BigDecimal getPrecioSubtotalVenta() {
-        return precioSubtotalVenta;
-    }
-
-    public void setPrecioSubtotalVenta(BigDecimal precioSubtotalVenta) {
-        this.precioSubtotalVenta = precioSubtotalVenta;
-    }
-
     public String getFormulaCode() {
         return formulaCode;
     }
@@ -181,6 +205,30 @@ public class CatalogoItem {
 
     public void setParamsJson(String paramsJson) {
         this.paramsJson = paramsJson;
+    }
+
+    public BigDecimal getFactor() {
+        return factor;
+    }
+
+    public void setFactor(BigDecimal factor) {
+        this.factor = factor;
+    }
+
+    public Integer getOrden() {
+        return orden;
+    }
+
+    public void setOrden(Integer orden) {
+        this.orden = orden;
+    }
+
+    public Integer getSemana() {
+        return semana;
+    }
+
+    public void setSemana(Integer semana) {
+        this.semana = semana;
     }
 
     public LocalDate getVigenteDesde() {
@@ -214,14 +262,4 @@ public class CatalogoItem {
     public void setCreadoPor(Integer creadoPor) {
         this.creadoPor = creadoPor;
     }
-
-    public Integer getSemana() {
-        return semana;
-    }
-
-    public void setSemana(Integer semana) {
-        this.semana = semana;
-    }
-    
-    
 }

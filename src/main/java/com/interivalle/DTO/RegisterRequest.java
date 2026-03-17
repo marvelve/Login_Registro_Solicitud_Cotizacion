@@ -22,7 +22,6 @@ public class RegisterRequest {
     @NotBlank @Size(min = 6)
     private String contrasenaUsuario;
 
-    private Integer idRol;
     @NotBlank
     private String celularUsuario;
     @NotBlank
@@ -43,7 +42,4 @@ public class RegisterRequest {
 
     public String getContrasenaUsuario() { return contrasenaUsuario; }
     public void setContrasenaUsuario(String contrasenaUsuario) { this.contrasenaUsuario = contrasenaUsuario; }
-
-    public Integer getIdRol() { return idRol; }
-    public void setIdRol(Integer idRol) { this.idRol = idRol; }
 }

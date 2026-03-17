@@ -5,10 +5,15 @@
 package com.interivalle.Controlador;
 
 import com.interivalle.DTO.*;
+import com.interivalle.Modelo.Usuario;
 import com.interivalle.Servicio.SolicitudService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 /**
  *
  * @author mary_
@@ -22,23 +27,31 @@ public class SolicitudControler {
     @Autowired
     private SolicitudService service;
 
-    // PASO 1: Crear solicitud (radio + checklist + proyecto)
     @PostMapping
     public ResponseEntity<SolicitudResponse> crear(@RequestBody CrearSolicitud dto) {
-        return ResponseEntity.ok(service.crearSolicitud(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.crearSolicitud(dto));
     }
 
-    // Obtener solicitud para saber servicios seleccionados (pantalla 2)
+    @PutMapping("/{idSolicitud}/generar")
+    public ResponseEntity<SolicitudResponse> generarCotizacion(@PathVariable Integer idSolicitud) {
+        return ResponseEntity.ok(service.generarCotizacion(idSolicitud));
+    }
+
     @GetMapping("/{idSolicitud}")
     public ResponseEntity<SolicitudResponse> obtener(@PathVariable Integer idSolicitud) {
         return ResponseEntity.ok(service.obtenerSolicitud(idSolicitud));
     }
 
-    // Finalizar solicitud
-    @PatchMapping("/{idSolicitud}/enviar")
-    public ResponseEntity<String> enviar(@PathVariable Integer idSolicitud) {
-        service.enviarSolicitud(idSolicitud);
-        return ResponseEntity.ok("Solicitud enviada");
+    @GetMapping
+    public List<SolicitudResponse> listarSolicitudes(
+        @RequestParam(required = false) String correoUsuario) {
+
+        if (correoUsuario != null && !correoUsuario.isBlank()) {
+            return service.listarPorCorreoUsuario(correoUsuario);
+        }
+
+        return service.listarTodas();
     }
 }
+
 

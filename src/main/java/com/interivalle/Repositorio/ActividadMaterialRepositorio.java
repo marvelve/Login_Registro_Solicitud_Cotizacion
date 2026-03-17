@@ -11,15 +11,27 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *
  * @author mary_
  */
+
 public interface ActividadMaterialRepositorio extends JpaRepository<ActividadMaterial, Integer> {
 
-    //List<ActividadMaterial> findByActividad_IdCatalogoItemAndSemanaAndActivoTrue(Integer actividadId, String semana);
-    //List<ActividadMaterial> findByActividad_IdCatalogoItemAndActivoTrue(Integer actividadId);
-    
+    // Todos los materiales activos asociados a una actividad
     List<ActividadMaterial> findByActividad_IdCatalogoItemAndActivoTrue(Integer idActividad);
 
+    // Todos los materiales activos asociados a una actividad y semana
     List<ActividadMaterial> findByActividad_IdCatalogoItemAndSemanaAndActivoTrue(
             Integer idActividad,
             Integer semana
+    );
+
+    // Todas las relaciones activas de una semana
+    List<ActividadMaterial> findBySemanaAndActivoTrue(Integer semana);
+
+    // Todas las relaciones activas de un material
+    List<ActividadMaterial> findByMaterial_IdCatalogoItemAndActivoTrue(Integer idMaterial);
+
+    // Todas las relaciones activas de una actividad y un material
+    List<ActividadMaterial> findByActividad_IdCatalogoItemAndMaterial_IdCatalogoItemAndActivoTrue(
+            Integer idActividad,
+            Integer idMaterial
     );
 }

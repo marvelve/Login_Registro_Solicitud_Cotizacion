@@ -19,10 +19,8 @@ public class Servicios {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_servicios")
     private Integer idServicios;
-
     @Column(name = "nombre_servicio", nullable = false, unique = true)
     private String nombreServicio;
-
     @Column(name = "activo")
     private Boolean activo = true;
 
@@ -31,7 +29,6 @@ public class Servicios {
     public Servicios() {
         // Constructor vacío requerido por JPA
     }
-
     public Servicios(String nombreServicio) {
         this.nombreServicio = nombreServicio;
     }

@@ -5,6 +5,8 @@
  */
 package com.interivalle.DTO;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 /**
  *
@@ -17,7 +19,9 @@ public class SolicitudResponse {
     private String tipoSolicitud;
     private String estado;
     private String nombreProyecto;
-    private List<SolicitudServicioItem> solicitudServicios;;
+    private List<SolicitudServicioItem> solicitudServicios;
+    private LocalDate fechaSolicitud;
+    private String correoUsuario;
 
     public Integer getIdSolicitud() {
         return idSolicitud;
@@ -59,6 +63,21 @@ public class SolicitudResponse {
         this.solicitudServicios = solicitudServicios;
     }
 
+    public LocalDate getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+
+    public void setFechaSolicitud(LocalDate fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
+    }
+
+    public String getCorreoUsuario() {
+        return correoUsuario;
+    }
+
+    public void setCorreoUsuario(String correoUsuario) {
+        this.correoUsuario = correoUsuario;
+    }
 
 }
 

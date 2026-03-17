@@ -17,46 +17,38 @@ import jakarta.persistence.*;
     uniqueConstraints = @UniqueConstraint(columnNames = {"id_solicitud", "id_servicios"})
 )
 public class SolicitudServicios {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idSolicitudServicio;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_solicitud", nullable = false)
     private Solicitud solicitud;
-
     @ManyToOne
     @JoinColumn(name = "id_servicios", nullable = false)
     private Servicios servicios;
-
     // "GENERADO" | "PENDIENTE" | etc
     @Column(name = "estado")
     private String estado;
-
+    
     // ---------- getters & setters ----------
-
     public Integer getIdSolicitudServicio() {
         return idSolicitudServicio;
     }
-
     public void setIdSolicitudServicio(Integer idSolicitudServicio) {
         this.idSolicitudServicio = idSolicitudServicio;
     }
-
+    
     public Solicitud getSolicitud() {
         return solicitud;
     }
-
     public void setSolicitud(Solicitud solicitud) {
         this.solicitud = solicitud;
-    }
-
+    }  
+    
     public Servicios getServicios() {
         return servicios;
     }
-
     public void setServicios(Servicios servicios) {
         this.servicios = servicios;
     }
@@ -64,7 +56,6 @@ public class SolicitudServicios {
     public String getEstado() {
         return estado;
     }
-
     public void setEstado(String estado) {
         this.estado = estado;
     }

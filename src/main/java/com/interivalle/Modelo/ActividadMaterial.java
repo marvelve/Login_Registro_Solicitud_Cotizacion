@@ -38,6 +38,12 @@ public class ActividadMaterial {
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
+    
+    @Column(name = "modo_cantidad", length = 30)
+    private String modoCantidad;
+    
+    @Column(name = "factor", precision = 12, scale = 2)
+    private BigDecimal factor;
 
     public Integer getIdActividadMaterial() { return idActividadMaterial; }
     public void setIdActividadMaterial(Integer idActividadMaterial) { this.idActividadMaterial = idActividadMaterial; }
@@ -56,4 +62,12 @@ public class ActividadMaterial {
 
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    public String getModoCantidad() { return modoCantidad; }
+    public void setModoCantidad(String modoCantidad) {this.modoCantidad = modoCantidad;}
+
+    public BigDecimal getFactor() { return factor;   }
+    public void setFactor(BigDecimal factor) { this.factor = factor; }
+    
+    
 }
