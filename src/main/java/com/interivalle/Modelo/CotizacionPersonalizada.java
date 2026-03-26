@@ -18,9 +18,13 @@ public class CotizacionPersonalizada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cotizacion")
-    private Integer idCotizacion;
+    @Column(name = "id_cotizacion_personalizada")
+    private Integer idCotizacionPersonalizada;
 
+    @ManyToOne
+    @JoinColumn(name = "id_cotizacion", nullable = false)
+    private Cotizacion cotizacion;
+    
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
@@ -50,14 +54,22 @@ public class CotizacionPersonalizada {
     public CotizacionPersonalizada() {
     }
 
-    public Integer getIdCotizacion() {
-        return idCotizacion;
+    public Integer getIdCotizacionPersonalizada() {
+        return idCotizacionPersonalizada;
     }
 
-    public void setIdCotizacion(Integer idCotizacion) {
-        this.idCotizacion = idCotizacion;
+    public void setIdCotizacionPersonalizada(Integer idCotizacion) {
+        this.idCotizacionPersonalizada = idCotizacion;
     }
 
+    public Cotizacion getCotizacion() {
+        return cotizacion;
+    }
+
+    public void setCotizacion(Cotizacion cotizacion) {
+        this.cotizacion = cotizacion;
+    }
+    
     public Usuario getUsuario() {
         return usuario;
     }

@@ -36,7 +36,7 @@ public class VidrioService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada"));
 
         Vidrio item = new Vidrio();
-        item.setCotizacion(cotizacion);
+        item.setCotizacionPersonalizada(cotizacion);
         item.setTipoVidrio(req.getTipoVidrio());
         item.setAncho(req.getAncho());
         item.setAlto(req.getAlto());
@@ -50,7 +50,7 @@ public class VidrioService {
     }
 
     public List<Vidrio> listarPorCotizacion(Integer idCotizacion) {
-        return vidrioRepo.findByCotizacionIdCotizacion(idCotizacion);
+        return vidrioRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacion);
     }
 
     public Vidrio obtenerPorId(Integer id) {
@@ -65,7 +65,7 @@ public class VidrioService {
         if (req.getIdCotizacion() != null) {
             CotizacionPersonalizada cotizacion = cotizacionRepo.findById(req.getIdCotizacion())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada"));
-            item.setCotizacion(cotizacion);
+            item.setCotizacionPersonalizada(cotizacion);
         }
 
         item.setTipoVidrio(req.getTipoVidrio());

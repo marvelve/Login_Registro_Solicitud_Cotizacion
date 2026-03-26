@@ -35,7 +35,7 @@ public class MesonGranitoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada"));
 
         MesonGranito item = new MesonGranito();
-        item.setCotizacion(cotizacion);
+        item.setCotizacionPersonalizada(cotizacion);
         item.setTipoGranito(req.getTipoGranito());
         item.setLargo(req.getLargo());
         item.setAncho(req.getAncho());
@@ -49,7 +49,7 @@ public class MesonGranitoService {
     }
 
     public List<MesonGranito> listarPorCotizacion(Integer idCotizacion) {
-        return mesonRepo.findByCotizacionIdCotizacion(idCotizacion);
+        return mesonRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacion);
     }
 
     public MesonGranito obtenerPorId(Integer id) {
@@ -64,7 +64,7 @@ public class MesonGranitoService {
         if (req.getIdCotizacion() != null) {
             CotizacionPersonalizada cotizacion = cotizacionRepo.findById(req.getIdCotizacion())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada"));
-            item.setCotizacion(cotizacion);
+            item.setCotizacionPersonalizada(cotizacion);
         }
 
         item.setTipoGranito(req.getTipoGranito());

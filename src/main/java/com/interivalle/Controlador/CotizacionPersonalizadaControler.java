@@ -35,12 +35,6 @@ public class CotizacionPersonalizadaControler {
         return cotizacionService.listarTodas();
     }
 
-    // OBTENER POR ID
-    @GetMapping("/{id}")
-    public CotizacionPersonalizadaResponse obtenerPorId(@PathVariable Integer id) {
-        return cotizacionService.obtenerPorId(id);
-    }
-
     // LISTAR POR USUARIO
     @GetMapping("/usuario/{idUsuario}")
     public List<CotizacionPersonalizadaResponse> listarPorUsuario(@PathVariable Integer idUsuario) {
@@ -59,9 +53,22 @@ public class CotizacionPersonalizadaControler {
     public CotizacionPersonalizadaResponse recalcular(@PathVariable Integer id) {
         return cotizacionService.recalcular(id);
     }
+
     
-    @GetMapping("/{id}/detalle")
-    public CotizacionPersonalizadaDetalleResponse obtenerDetalle(@PathVariable Integer id) {
-    return cotizacionService.obtenerDetalle(id);
-}
+    @GetMapping("/{idCotizacionPersonalizada}")
+    public CotizacionPersonalizadaResponse obtenerPorId(@PathVariable Integer idCotizacionPersonalizada) {
+        return cotizacionService.obtenerPorId(idCotizacionPersonalizada);
+    }
+
+    @GetMapping("/cotizacion/{idCotizacion}/detalle")
+    public CotizacionPersonalizadaDetalleResponse obtenerDetallePorCotizacion(@PathVariable Integer idCotizacion) {
+        return cotizacionService.obtenerDetallePorCotizacion(idCotizacion);
+    }
+
+    @GetMapping("/{idCotizacionPersonalizada}/detalle")
+    public CotizacionPersonalizadaDetalleResponse obtenerDetallePorIdPersonalizada(
+            @PathVariable Integer idCotizacionPersonalizada) {
+        return cotizacionService.obtenerDetalle(idCotizacionPersonalizada);
+    }
+    
 }

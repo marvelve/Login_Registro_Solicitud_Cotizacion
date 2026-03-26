@@ -13,5 +13,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author mary_
  */
 public interface CarpinteriaRepositorio extends JpaRepository<Carpinteria, Integer> {
-   List<Carpinteria> findByCotizacionIdCotizacion (Integer IdCotizacion);
+   List<Carpinteria> findByCotizacionPersonalizada_IdCotizacionPersonalizada(Integer IdCotizacionPersonalizada);
 }

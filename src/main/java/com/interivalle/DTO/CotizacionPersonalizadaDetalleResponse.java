@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class CotizacionPersonalizadaDetalleResponse {
 
+    private Integer idCotizacionPersonalizada;
     private Integer idCotizacion;
     private Integer idSolicitud;
     private Integer idUsuario;
@@ -28,12 +29,12 @@ public class CotizacionPersonalizadaDetalleResponse {
     private List<VidrioResponse> vidrio;
     private List<MesonGranitoResponse> mesonGranito;
 
-    public Integer getIdCotizacion() {
-        return idCotizacion;
+    public Integer getIdCotizacionPersonalizada() {
+        return idCotizacionPersonalizada;
     }
 
-    public void setIdCotizacion(Integer idCotizacion) {
-        this.idCotizacion = idCotizacion;
+    public void setIdCotizacionPersonalizada(Integer idCotizacionPersonalizada) {
+        this.idCotizacionPersonalizada = idCotizacionPersonalizada;
     }
 
     public Integer getIdSolicitud() {
@@ -131,4 +132,14 @@ public class CotizacionPersonalizadaDetalleResponse {
     public void setMesonGranito(List<MesonGranitoResponse> mesonGranito) {
         this.mesonGranito = mesonGranito;
     }
+
+    public Integer getIdCotizacion() {
+        return idCotizacion;
+    }
+
+    public void setIdCotizacion(Integer idCotizacion) {
+        this.idCotizacion = idCotizacion;
+    }
+    
+    
 }

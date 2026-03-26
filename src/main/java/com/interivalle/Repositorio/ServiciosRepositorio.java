@@ -5,12 +5,16 @@
 package com.interivalle.Repositorio;
 
 import com.interivalle.Modelo.Servicios;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 /**
  *
  * @author mary_
  */
-
+@Repository
 public interface ServiciosRepositorio extends JpaRepository<Servicios, Integer> {
+
+    List<Servicios> findByActivoTrue();
 }
 

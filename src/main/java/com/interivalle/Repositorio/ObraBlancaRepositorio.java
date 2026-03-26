@@ -13,5 +13,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author mary_
  */
 public interface ObraBlancaRepositorio extends JpaRepository<ObraBlanca, Integer> {
-    List<ObraBlanca> findByCotizacionIdCotizacion(Integer idCotizacion);
+    
+    // Consultar actividades adicionales por cabecera personalizada
+    List<ObraBlanca> findByCotizacionPersonalizada_IdCotizacionPersonalizada(Integer idCotizacionPersonalizada);
+
+    // Consultar actividades adicionales por cotización base, pasando por la cabecera personalizada
+    List<ObraBlanca> findByCotizacionPersonalizada_Cotizacion_IdCotizacion(Integer idCotizacion);
 }

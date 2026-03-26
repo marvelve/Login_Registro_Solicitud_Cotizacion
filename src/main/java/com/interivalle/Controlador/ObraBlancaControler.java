@@ -5,6 +5,7 @@
 package com.interivalle.Controlador;
 
 import com.interivalle.DTO.ObraBlancaRequest;
+import com.interivalle.DTO.ObraBlancaResponse;
 import com.interivalle.Modelo.ObraBlanca;
 import com.interivalle.Servicio.ObraBlancaService;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author mary_
  */
+
 @RestController
 @RequestMapping("/api/obra-blanca")
 @CrossOrigin(origins = "*")
@@ -24,25 +26,25 @@ public class ObraBlancaControler {
 
     // GUARDAR
     @PostMapping
-    public ObraBlanca guardar(@RequestBody ObraBlancaRequest req) {
+    public ObraBlancaResponse guardar(@RequestBody ObraBlancaRequest req) {
         return obraBlancaService.guardar(req);
     }
 
-    // LISTAR POR COTIZACION
+    // LISTAR POR COTIZACION BASE
     @GetMapping("/cotizacion/{idCotizacion}")
-    public List<ObraBlanca> listarPorCotizacion(@PathVariable Integer idCotizacion) {
+    public List<ObraBlancaResponse> listarPorCotizacion(@PathVariable Integer idCotizacion) {
         return obraBlancaService.listarPorCotizacion(idCotizacion);
     }
 
     // OBTENER POR ID
     @GetMapping("/{id}")
-    public ObraBlanca obtenerPorId(@PathVariable Integer id) {
+    public ObraBlancaResponse obtenerPorId(@PathVariable Integer id) {
         return obraBlancaService.obtenerPorId(id);
     }
 
     // ACTUALIZAR
     @PutMapping("/{id}")
-    public ObraBlanca actualizar(@PathVariable Integer id, @RequestBody ObraBlancaRequest req) {
+    public ObraBlancaResponse actualizar(@PathVariable Integer id, @RequestBody ObraBlancaRequest req) {
         return obraBlancaService.actualizar(id, req);
     }
 

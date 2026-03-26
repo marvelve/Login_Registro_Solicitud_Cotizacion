@@ -11,6 +11,7 @@ import java.math.BigDecimal;
  */
 
 public class ObraBlancaRequest {
+    private Integer idCotizacionPersonalizada;
     private Integer idCotizacion;
     private String actividad;
     private String lugar;
@@ -21,12 +22,12 @@ public class ObraBlancaRequest {
     private BigDecimal medida;
     private String descripcion;
 
-    public Integer getIdCotizacion() {
-        return idCotizacion;
+    public Integer getIdCotizacionPersonalizada() {
+        return idCotizacionPersonalizada;
     }
 
-    public void setIdCotizacion(Integer idCotizacion) {
-        this.idCotizacion = idCotizacion;
+    public void setIdCotizacionPersonalizada(Integer idCotizacionPersonalizada) {
+        this.idCotizacionPersonalizada = idCotizacionPersonalizada;
     }
 
     public String getActividad() {
@@ -92,4 +93,14 @@ public class ObraBlancaRequest {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+
+    public Integer getIdCotizacion() {
+        return idCotizacion;
+    }
+
+    public void setIdCotizacion(Integer idCotizacion) {
+        this.idCotizacion = idCotizacion;
+    }
+    
+    
 }

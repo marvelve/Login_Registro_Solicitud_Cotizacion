@@ -1,5 +1,7 @@
 package com.interivalle.Servicio;
 
+import com.interivalle.DTO.CotizacionVistaCompletaResponse;
+import com.interivalle.DTO.CotizacionPersonalizadaDetalleResponse;
 import com.interivalle.DTO.CotizacionActividadResponse;
 import com.interivalle.DTO.CotizacionBaseResponse;
 import com.interivalle.DTO.CotizacionDetalleResponse;
@@ -67,6 +69,7 @@ public class CotizacionService {
     @Autowired private CotizacionDetalleRepositorio detalleRepo;
     @Autowired private CotizacionObservacionRepositorio obsRepo;
     @Autowired private CotizacionHistorialRepositorio histRepo;
+    @Autowired private CotizacionPersonalizadaService cotizacionPersonalizadaService;
 
     @Autowired private SolicitudRepositorio solicitudRepo;
     @Autowired private ServiciosRepositorio serviciosRepo;
@@ -746,5 +749,64 @@ public class CotizacionService {
             .filter(i -> i.getTipoItem() == tipo)
             .map(i -> i.getSubtotalVenta() == null ? BigDecimal.ZERO : i.getSubtotalVenta())
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    public CotizacionVistaCompletaResponse obtenerVistaCompleta(Integer idUsuario, Integer idCotizacion) {
+    Cotizacion cot = getCotizacionDelUsuario(idUsuario, idCotizacion);
+
+    List<CotizacionDetalle> detalles = detalleRepo.findByCotizacion_IdCotizacion(cot.getIdCotizacion());
+    detalles.sort(Comparator
+        .comparing((CotizacionDetalle d) -> d.getServicio().getIdServicio())
+        .thenComparing(d -> d.getTipoItem().name())
+        .thenComparing(d -> d.getCategoria() == null ? "" : d.getCategoria())
+        .thenComparing(d -> d.getSemana() == null ? 0 : d.getSemana())
+        .thenComparing(d -> d.getActividadMaterial() == null ? "" : d.getActividadMaterial())
+        .thenComparing(d -> d.getDescripcion() == null ? "" : d.getDescripcion())
+    );
+
+    List<CotizacionDetalleResponse> detalleBase = detalles.stream()
+        .map(this::toDetalleResponse)
+        .collect(Collectors.toList());
+
+    CotizacionPersonalizadaDetalleResponse personalizada = null;
+    BigDecimal totalAdicionales = BigDecimal.ZERO;
+
+    try {
+       // personalizada = cotizacionPersonalizadaService.obtenerDetalle(idCotizacion);
+        personalizada = cotizacionPersonalizadaService.obtenerDetallePorCotizacion(idCotizacion);
+
+        if (personalizada != null && personalizada.getTotal() != null) {
+            totalAdicionales = personalizada.getTotal();
+        }
+    } catch (Exception e) {
+        //personalizada = null;
+        //totalAdicionales = BigDecimal.ZERO;
+        e.printStackTrace();
+     throw e;
+    }
+
+    BigDecimal totalBase = cot.getTotalEstimado() != null
+        ? cot.getTotalEstimado()
+        : BigDecimal.ZERO;
+
+    BigDecimal totalGeneral = totalBase.add(totalAdicionales);
+
+    CotizacionVistaCompletaResponse resp = new CotizacionVistaCompletaResponse();
+    resp.setIdCotizacion(cot.getIdCotizacion());
+    resp.setNombreProyecto(cot.getSolicitud().getNombreProyectoUsuario());
+    resp.setEstado(cot.getEstado().name());
+
+    resp.setTotalManoObra(cot.getTotalManoObra() != null ? cot.getTotalManoObra() : BigDecimal.ZERO);
+    resp.setTotalMateriales(cot.getTotalMateriales() != null ? cot.getTotalMateriales() : BigDecimal.ZERO);
+    resp.setTotalProductos(cot.getTotalProductos() != null ? cot.getTotalProductos() : BigDecimal.ZERO);
+    resp.setTotalEstimadoBase(totalBase);
+
+    resp.setTotalAdicionales(totalAdicionales);
+    resp.setTotalGeneral(totalGeneral);
+
+    resp.setDetalleBase(detalleBase);
+    resp.setPersonalizada(personalizada);
+
+    return resp;
     }
 }

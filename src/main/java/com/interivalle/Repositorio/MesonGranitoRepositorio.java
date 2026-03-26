@@ -13,5 +13,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author mary_
  */
 public interface MesonGranitoRepositorio extends JpaRepository<MesonGranito, Integer> {
-    List<MesonGranito> findByCotizacionIdCotizacion(Integer IdCotizacion);
+    List<MesonGranito> findByCotizacionPersonalizada_IdCotizacionPersonalizada(Integer IdCotizacionPersonalizada);
 }

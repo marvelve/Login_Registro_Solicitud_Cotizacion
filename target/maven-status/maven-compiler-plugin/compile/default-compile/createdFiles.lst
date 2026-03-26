@@ -13,8 +13,10 @@ com\interivalle\Repositorio\CotizacionPersonalizadaRepositorio.class
 com\interivalle\Security\JwtAuthFilter.class
 com\interivalle\DTO\UsuarioUpdate.class
 com\interivalle\DTO\CarpinteriaBaseRequest.class
+com\interivalle\Repositorio\ActividadPersonalizadaRepositorio.class
 com\interivalle\DTO\CotizacionBaseResponse.class
 com\interivalle\DTO\EnviarSolicitud.class
+com\interivalle\DTO\CotizacionVistaCompletaResponse.class
 com\interivalle\DTO\CrearSolicitud.class
 com\interivalle\DTO\GenerarCotizacionBaseRequest.class
 com\interivalle\Modelo\enums\EstadoCotizacion.class
@@ -45,6 +47,7 @@ com\interivalle\DTO\CotizacionObservacionResponse.class
 com\interivalle\Modelo\ObraBlanca.class
 com\interivalle\Controlador\AdminUsuarioControler.class
 com\interivalle\Security\JwtService.class
+com\interivalle\Modelo\ActividadPersonalizada.class
 com\interivalle\Repositorio\CatalogoItemRepositorio.class
 com\interivalle\Modelo\CotizacionCarpinteria.class
 com\interivalle\Servicio\CotizacionService.class
@@ -82,6 +85,7 @@ com\interivalle\Modelo\CotizacionDetalle.class
 com\interivalle\Modelo\MesonGranito.class
 com\interivalle\DTO\AuthResponse.class
 com\interivalle\DTO\MesonGranitoResponse.class
+com\interivalle\Controlador\ActividadPersonalizadaControler.class
 com\interivalle\DTO\MesonGranitoRequest.class
 com\interivalle\Controlador\MesonGranitoControler.class
 com\interivalle\DTO\VidrioBaseRequest.class

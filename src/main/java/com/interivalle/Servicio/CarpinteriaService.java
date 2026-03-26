@@ -35,7 +35,7 @@ public class CarpinteriaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada"));
 
         Carpinteria item = new Carpinteria();
-        item.setCotizacion(cotizacion);
+        item.setCotizacionPersonalizada(cotizacion);
         item.setTipoMueble(req.getTipoMueble());
         item.setMaterial(req.getMaterial());
         item.setLargo(req.getLargo());
@@ -50,7 +50,7 @@ public class CarpinteriaService {
     }
 
     public List<Carpinteria> listarPorCotizacion(Integer idCotizacion) {
-        return carpinteriaRepo.findByCotizacionIdCotizacion(idCotizacion);
+        return carpinteriaRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacion);
     }
 
     public Carpinteria obtenerPorId(Integer id) {
@@ -65,7 +65,7 @@ public class CarpinteriaService {
         if (req.getIdCotizacion() != null) {
             CotizacionPersonalizada cotizacion = cotizacionRepo.findById(req.getIdCotizacion())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada"));
-            item.setCotizacion(cotizacion);
+            item.setCotizacionPersonalizada(cotizacion);
         }
 
         item.setTipoMueble(req.getTipoMueble());

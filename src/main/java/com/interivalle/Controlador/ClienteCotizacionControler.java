@@ -5,6 +5,7 @@
 package com.interivalle.Controlador;
 import com.interivalle.DTO.CotizacionBaseResponse;
 import com.interivalle.DTO.CotizacionResponse;
+import com.interivalle.DTO.CotizacionVistaCompletaResponse;
 import com.interivalle.DTO.CrearCotizacionRequest;
 import com.interivalle.DTO.GenerarCotizacionBaseRequest;
 import com.interivalle.Modelo.Usuario;
@@ -85,4 +86,17 @@ public class ClienteCotizacionControler {
 
         return cotizacionService.listarPorCliente(usuario.getIdUsuario());
     }
+   
+   @GetMapping("/{idCotizacion}/vista-completa")
+        public CotizacionVistaCompletaResponse vistaCompleta(
+        @PathVariable Integer idCotizacion,
+        Authentication authentication) {
+
+       String correo = authentication.getName();
+
+        Usuario usuario = usuarioRepo.findByCorreoUsuario(correo)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+        return cotizacionService.obtenerVistaCompleta(usuario.getIdUsuario(), idCotizacion);
+        }
 }

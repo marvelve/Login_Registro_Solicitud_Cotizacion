@@ -12,6 +12,7 @@ import com.interivalle.DTO.CarpinteriaResponse;
 import com.interivalle.DTO.VidrioResponse;
 import com.interivalle.DTO.MesonGranitoResponse;
 import com.interivalle.Modelo.Carpinteria;
+import com.interivalle.Modelo.Cotizacion;
 import com.interivalle.Modelo.CotizacionPersonalizada;
 import com.interivalle.Modelo.MesonGranito;
 import com.interivalle.Modelo.ObraBlanca;
@@ -19,6 +20,7 @@ import com.interivalle.Modelo.Solicitud;
 import com.interivalle.Modelo.Vidrio;
 import com.interivalle.Repositorio.CarpinteriaRepositorio;
 import com.interivalle.Repositorio.CotizacionPersonalizadaRepositorio;
+import com.interivalle.Repositorio.CotizacionRepositorio;
 import com.interivalle.Repositorio.MesonGranitoRepositorio;
 import com.interivalle.Repositorio.ObraBlancaRepositorio;
 import com.interivalle.Repositorio.SolicitudRepositorio;
@@ -45,6 +47,9 @@ public class CotizacionPersonalizadaService {
 
     @Autowired
     private SolicitudRepositorio solicitudRepo;
+    
+    @Autowired
+    private CotizacionRepositorio cotizacionBaseRepo;
 
     @Autowired
     private ObraBlancaRepositorio obraBlancaRepo;
@@ -59,29 +64,42 @@ public class CotizacionPersonalizadaService {
     private MesonGranitoRepositorio mesonGranitoRepo;
 
     // CREAR COTIZACION PRINCIPAL
-    public CotizacionPersonalizadaResponse crear(CotizacionPersonalizadaRequest req) {
-        Solicitud solicitud = solicitudRepo.findById(req.getIdSolicitud())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
+public CotizacionPersonalizadaResponse crear(CotizacionPersonalizadaRequest req) {
 
-        CotizacionPersonalizada cotizacion = new CotizacionPersonalizada();
-        cotizacion.setSolicitud(solicitud);
-        cotizacion.setUsuario(solicitud.getUsuario());
-
-        if (req.getNombreProyecto() != null && !req.getNombreProyecto().trim().isEmpty()) {
-            cotizacion.setNombreProyecto(req.getNombreProyecto());
-        } else {
-            cotizacion.setNombreProyecto(solicitud.getNombreProyectoUsuario());
-        }
-
-        cotizacion.setFechaCotizacion(LocalDate.now());
-        cotizacion.setEstado("BORRADOR");
-        cotizacion.setSubtotal(BigDecimal.ZERO);
-        cotizacion.setTotal(BigDecimal.ZERO);
-        cotizacion.setObservacionGeneral(req.getObservacionGeneral());
-
-        CotizacionPersonalizada guardada = cotizacionRepo.save(cotizacion);
-        return toResponse(guardada);
+    if (req.getIdSolicitud() == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "idSolicitud es obligatorio");
     }
+
+    if (req.getIdCotizacion() == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "idCotizacion es obligatorio");
+    }
+
+    Solicitud solicitud = solicitudRepo.findById(req.getIdSolicitud())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
+
+    Cotizacion cotizacionBase = cotizacionBaseRepo.findById(req.getIdCotizacion())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización base no encontrada"));
+
+    CotizacionPersonalizada cotizacion = new CotizacionPersonalizada();
+    cotizacion.setSolicitud(solicitud);
+    cotizacion.setCotizacion(cotizacionBase); // ESTA LINEA ES LA CLAVE
+    cotizacion.setUsuario(solicitud.getUsuario());
+
+    if (req.getNombreProyecto() != null && !req.getNombreProyecto().trim().isEmpty()) {
+        cotizacion.setNombreProyecto(req.getNombreProyecto());
+    } else {
+        cotizacion.setNombreProyecto(solicitud.getNombreProyectoUsuario());
+    }
+
+    cotizacion.setFechaCotizacion(LocalDate.now());
+    cotizacion.setEstado("PENDIENTE");
+    cotizacion.setSubtotal(BigDecimal.ZERO);
+    cotizacion.setTotal(BigDecimal.ZERO);
+    cotizacion.setObservacionGeneral(req.getObservacionGeneral());
+
+    CotizacionPersonalizada guardada = cotizacionRepo.save(cotizacion);
+    return toResponse(guardada);
+}
 
     // LISTAR TODAS
     public List<CotizacionPersonalizadaResponse> listarTodas() {
@@ -101,7 +119,7 @@ public class CotizacionPersonalizadaService {
 
     // LISTAR POR USUARIO
     public List<CotizacionPersonalizadaResponse> listarPorUsuario(Integer idUsuario) {
-        return cotizacionRepo.findByUsuarioIdUsuario(idUsuario)
+        return cotizacionRepo.findByUsuario_IdUsuario(idUsuario)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -118,13 +136,14 @@ public class CotizacionPersonalizadaService {
 
         String nuevoEstado = estado.trim().toUpperCase();
 
-        if (!nuevoEstado.equals("BORRADOR")
-                && !nuevoEstado.equals("GENERADA")
-                && !nuevoEstado.equals("APROBADA")
-                && !nuevoEstado.equals("RECHAZADA")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Estado no válido. Use: BORRADOR, GENERADA, APROBADA o RECHAZADA");
-        }
+        if (!nuevoEstado.equals("PENDIENTE")
+           && !nuevoEstado.equals("BORRADOR")
+           && !nuevoEstado.equals("GENERADA")
+           && !nuevoEstado.equals("APROBADA")
+           && !nuevoEstado.equals("RECHAZADA")) {
+       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+               "Estado no válido. Use: PENDIENTE, BORRADOR, GENERADA, APROBADA o RECHAZADA");
+            }
 
         cotizacion.setEstado(nuevoEstado);
         CotizacionPersonalizada actualizada = cotizacionRepo.save(cotizacion);
@@ -162,7 +181,7 @@ public class CotizacionPersonalizadaService {
     // METODOS PRIVADOS DE SUMA
     // =========================
     private BigDecimal sumarObraBlanca(Integer idCotizacion) {
-        List<ObraBlanca> items = obraBlancaRepo.findByCotizacionIdCotizacion(idCotizacion);
+        List<ObraBlanca> items = obraBlancaRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacion);
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -176,7 +195,7 @@ public class CotizacionPersonalizadaService {
     }
 
     private BigDecimal sumarCarpinteria(Integer idCotizacion) {
-        List<Carpinteria> items = carpinteriaRepo.findByCotizacionIdCotizacion(idCotizacion);
+        List<Carpinteria> items = carpinteriaRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacion);
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -190,7 +209,7 @@ public class CotizacionPersonalizadaService {
     }
 
     private BigDecimal sumarVidrio(Integer idCotizacion) {
-        List<Vidrio> items = vidrioRepo.findByCotizacionIdCotizacion(idCotizacion);
+        List<Vidrio> items = vidrioRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacion);
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -204,7 +223,7 @@ public class CotizacionPersonalizadaService {
     }
 
     private BigDecimal sumarMeson(Integer idCotizacion) {
-        List<MesonGranito> items = mesonGranitoRepo.findByCotizacionIdCotizacion(idCotizacion);
+        List<MesonGranito> items = mesonGranitoRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacion);
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -222,7 +241,7 @@ public class CotizacionPersonalizadaService {
     // =========================
     public CotizacionPersonalizadaResponse toResponse(CotizacionPersonalizada cotizacion) {
         CotizacionPersonalizadaResponse dto = new CotizacionPersonalizadaResponse();
-        dto.setIdCotizacion(cotizacion.getIdCotizacion());
+        dto.setIdCotizacionPersonalizada(cotizacion.getIdCotizacionPersonalizada());
         dto.setIdSolicitud(cotizacion.getSolicitud().getIdSolicitud());
         dto.setNombreProyecto(cotizacion.getNombreProyecto());
         dto.setFechaCotizacion(cotizacion.getFechaCotizacion());
@@ -233,17 +252,29 @@ public class CotizacionPersonalizadaService {
         return dto;
     }
     
-    public CotizacionPersonalizadaDetalleResponse obtenerDetalle(Integer id) {
-    CotizacionPersonalizada cotizacion = cotizacionRepo.findById(id)
+    public CotizacionPersonalizadaDetalleResponse obtenerDetalle(Integer idCotizacionPersonalizada) {
+    CotizacionPersonalizada cotizacion = cotizacionRepo.findById(idCotizacionPersonalizada)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada"));
 
-    List<ObraBlanca> listaObraBlanca = obraBlancaRepo.findByCotizacionIdCotizacion(id);
-    List<Carpinteria> listaCarpinteria = carpinteriaRepo.findByCotizacionIdCotizacion(id);
-    List<Vidrio> listaVidrio = vidrioRepo.findByCotizacionIdCotizacion(id);
-    List<MesonGranito> listaMeson = mesonGranitoRepo.findByCotizacionIdCotizacion(id);
+    List<ObraBlanca> listaObraBlanca =
+            obraBlancaRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacionPersonalizada);
+
+    List<Carpinteria> listaCarpinteria =
+            carpinteriaRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacionPersonalizada);
+
+    List<Vidrio> listaVidrio =
+            vidrioRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacionPersonalizada);
+
+    List<MesonGranito> listaMeson =
+            mesonGranitoRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(idCotizacionPersonalizada);
 
     CotizacionPersonalizadaDetalleResponse dto = new CotizacionPersonalizadaDetalleResponse();
-    dto.setIdCotizacion(cotizacion.getIdCotizacion());
+    dto.setIdCotizacionPersonalizada(cotizacion.getIdCotizacionPersonalizada());
+
+    if (cotizacion.getCotizacion() != null) {
+        dto.setIdCotizacion(cotizacion.getCotizacion().getIdCotizacion());
+    }
+
     dto.setIdSolicitud(cotizacion.getSolicitud().getIdSolicitud());
     dto.setIdUsuario(cotizacion.getUsuario().getIdUsuario());
     dto.setNombreProyecto(cotizacion.getNombreProyecto());
@@ -317,5 +348,50 @@ private MesonGranitoResponse toMesonGranitoResponse(MesonGranito item) {
     dto.setDescripcion(item.getDescripcion());
     dto.setSubtotal(item.getSubtotal());
     return dto;
+    }
+
+    public CotizacionPersonalizadaDetalleResponse obtenerDetallePorCotizacion(Integer idCotizacion) {
+        CotizacionPersonalizada cotizacion = cotizacionRepo
+                .findTopByCotizacion_IdCotizacionOrderByIdCotizacionPersonalizadaDesc(idCotizacion)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe cotización personalizada para la cotización base: " + idCotizacion
+                ));
+
+        CotizacionPersonalizadaDetalleResponse resp = new CotizacionPersonalizadaDetalleResponse();
+        
+        resp.setIdCotizacionPersonalizada(cotizacion.getIdCotizacionPersonalizada());        
+        resp.setIdCotizacion(cotizacion.getCotizacion().getIdCotizacion());
+        resp.setIdSolicitud(cotizacion.getSolicitud().getIdSolicitud());
+        resp.setIdUsuario(cotizacion.getUsuario().getIdUsuario());
+        resp.setNombreProyecto(cotizacion.getNombreProyecto());
+        resp.setFechaCotizacion(cotizacion.getFechaCotizacion());
+        resp.setEstado(cotizacion.getEstado());
+        resp.setSubtotal(cotizacion.getSubtotal());
+        resp.setTotal(cotizacion.getTotal());
+        resp.setObservacionGeneral(cotizacion.getObservacionGeneral());
+
+        resp.setObraBlanca(
+                obraBlancaRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(
+                        cotizacion.getIdCotizacionPersonalizada()
+                ).stream().map(this::toObraBlancaResponse).toList()
+        );
+
+        resp.setCarpinteria(
+                carpinteriaRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(cotizacion.getIdCotizacionPersonalizada())
+                        .stream().map(this::toCarpinteriaResponse).toList()
+        );
+
+        resp.setVidrio(
+                vidrioRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(cotizacion.getIdCotizacionPersonalizada())
+                        .stream().map(this::toVidrioResponse).toList()
+        );
+
+        resp.setMesonGranito(
+                mesonGranitoRepo.findByCotizacionPersonalizada_IdCotizacionPersonalizada(cotizacion.getIdCotizacionPersonalizada())
+                        .stream().map(this::toMesonGranitoResponse).toList()
+        );
+
+        return resp;
     }
 }

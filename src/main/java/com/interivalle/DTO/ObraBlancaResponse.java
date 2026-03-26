@@ -10,10 +10,11 @@ import java.math.BigDecimal;
  * @author mary_
  */
 
-
 public class ObraBlancaResponse {
 
     private Integer idObraBlanca;
+    private Integer idCotizacionPersonalizada;
+    private Integer idCotizacion;
     private String actividad;
     private String lugar;
     private String unidad;
@@ -21,8 +22,9 @@ public class ObraBlancaResponse {
     private Integer semanas;
     private BigDecimal precioUnitario;
     private BigDecimal medida;
-    private String descripcion;
     private BigDecimal subtotal;
+    private String descripcion;
+    private String tipoCobro;
 
     public Integer getIdObraBlanca() {
         return idObraBlanca;
@@ -30,6 +32,22 @@ public class ObraBlancaResponse {
 
     public void setIdObraBlanca(Integer idObraBlanca) {
         this.idObraBlanca = idObraBlanca;
+    }
+
+    public Integer getIdCotizacionPersonalizada() {
+        return idCotizacionPersonalizada;
+    }
+
+    public void setIdCotizacionPersonalizada(Integer idCotizacionPersonalizada) {
+        this.idCotizacionPersonalizada = idCotizacionPersonalizada;
+    }
+
+    public Integer getIdCotizacion() {
+        return idCotizacion;
+    }
+
+    public void setIdCotizacion(Integer idCotizacion) {
+        this.idCotizacion = idCotizacion;
     }
 
     public String getActividad() {
@@ -88,6 +106,14 @@ public class ObraBlancaResponse {
         this.medida = medida;
     }
 
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = subtotal;
+    }
+
     public String getDescripcion() {
         return descripcion;
     }
@@ -96,11 +122,11 @@ public class ObraBlancaResponse {
         this.descripcion = descripcion;
     }
 
-    public BigDecimal getSubtotal() {
-        return subtotal;
+    public String getTipoCobro() {
+        return tipoCobro;
     }
 
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
+    public void setTipoCobro(String tipoCobro) {
+        this.tipoCobro = tipoCobro;
     }
 }

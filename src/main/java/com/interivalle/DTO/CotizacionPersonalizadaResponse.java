@@ -12,6 +12,7 @@ import java.time.LocalDate;
 
 public class CotizacionPersonalizadaResponse {
     private Integer idCotizacion;
+    private Integer idCotizacionPersonalizada;
     private Integer idSolicitud;
     private String nombreProyecto;
     private LocalDate fechaCotizacion;
@@ -20,12 +21,12 @@ public class CotizacionPersonalizadaResponse {
     private BigDecimal total;
     private String observacionGeneral;
 
-    public Integer getIdCotizacion() {
-        return idCotizacion;
+    public Integer getIdCotizacionPersonalizada() {
+        return idCotizacionPersonalizada;
     }
 
-    public void setIdCotizacion(Integer idCotizacion) {
-        this.idCotizacion = idCotizacion;
+    public void setIdCotizacionPersonalizada(Integer idCotizacionPersonalizada) {
+        this.idCotizacionPersonalizada = idCotizacionPersonalizada;
     }
 
     public Integer getIdSolicitud() {
@@ -83,4 +84,13 @@ public class CotizacionPersonalizadaResponse {
     public void setObservacionGeneral(String observacionGeneral) {
         this.observacionGeneral = observacionGeneral;
     }
+
+    public Integer getIdCotizacion() {
+        return idCotizacion;
+    }
+
+    public void setIdCotizacion(Integer idCotizacion) {
+        this.idCotizacion = idCotizacion;
+    }
+    
 }

@@ -19,10 +19,10 @@ public class ObraBlanca {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_obra_blanca")
     private Integer idObraBlanca;
-
+    
     @ManyToOne
-    @JoinColumn(name = "id_cotizacion", nullable = false)
-    private CotizacionPersonalizada cotizacion;
+    @JoinColumn(name = "id_cotizacion_personalizada")
+    private CotizacionPersonalizada cotizacionPersonalizada;
 
     @Column(name = "actividad", length = 100)
     private String actividad;
@@ -62,12 +62,12 @@ public class ObraBlanca {
         this.idObraBlanca = idObraBlanca;
     }
 
-    public CotizacionPersonalizada getCotizacion() {
-        return cotizacion;
+    public CotizacionPersonalizada getCotizacionPersonalizada() {
+        return cotizacionPersonalizada;
     }
 
-    public void setCotizacion(CotizacionPersonalizada cotizacion) {
-        this.cotizacion = cotizacion;
+    public void setCotizacionPersonalizada(CotizacionPersonalizada cotizacionpersonalizada) {
+        this.cotizacionPersonalizada = cotizacionpersonalizada;
     }
 
     public String getActividad() {

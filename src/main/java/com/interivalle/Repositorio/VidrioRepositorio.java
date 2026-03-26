@@ -13,5 +13,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author mary_
  */
 public interface VidrioRepositorio extends JpaRepository<Vidrio, Integer>{
-    List<Vidrio> findByCotizacionIdCotizacion(Integer IdCotizacion);
+    List<Vidrio> findByCotizacionPersonalizada_IdCotizacionPersonalizada(Integer IdCotizacionPersonalizada);
 }

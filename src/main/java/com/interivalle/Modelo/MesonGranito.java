@@ -21,9 +21,8 @@ public class MesonGranito {
     private Integer idMeson;
 
     @ManyToOne
-    @JoinColumn(name = "id_cotizacion", nullable = false)
-    private CotizacionPersonalizada cotizacion;
-
+    @JoinColumn(name = "id_cotizacion_personalizada")
+    private CotizacionPersonalizada cotizacionPersonalizada;
     @Column(name = "tipo_granito", length = 100)
     private String tipoGranito;
 
@@ -59,13 +58,15 @@ public class MesonGranito {
         this.idMeson = idMeson;
     }
 
-    public CotizacionPersonalizada getCotizacion() {
-        return cotizacion;
+    public CotizacionPersonalizada getCotizacionPersonalizada() {
+        return cotizacionPersonalizada;
     }
 
-    public void setCotizacion(CotizacionPersonalizada cotizacion) {
-        this.cotizacion = cotizacion;
+    public void setCotizacionPersonalizada(CotizacionPersonalizada cotizacionPersonalizada) {
+        this.cotizacionPersonalizada = cotizacionPersonalizada;
     }
+
+    
 
     public String getTipoGranito() {
         return tipoGranito;

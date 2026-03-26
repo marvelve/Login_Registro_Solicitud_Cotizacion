@@ -22,8 +22,8 @@ public class Carpinteria {
     private Integer idCarpinteria;
 
     @ManyToOne
-    @JoinColumn(name = "id_cotizacion", nullable = false)
-    private CotizacionPersonalizada cotizacion;
+    @JoinColumn(name = "id_cotizacion_personalizada")
+    private CotizacionPersonalizada cotizacionPersonalizada;
 
     @Column(name = "tipo_mueble", length = 100)
     private String tipoMueble;
@@ -63,12 +63,12 @@ public class Carpinteria {
         this.idCarpinteria = idCarpinteria;
     }
 
-    public CotizacionPersonalizada getCotizacion() {
-        return cotizacion;
+    public CotizacionPersonalizada getCotizacionPersonalizada() {
+        return cotizacionPersonalizada;
     }
 
-    public void setCotizacion(CotizacionPersonalizada cotizacion) {
-        this.cotizacion = cotizacion;
+    public void setCotizacionPersonalizada(CotizacionPersonalizada cotizacionPersonalizada) {
+        this.cotizacionPersonalizada = cotizacionPersonalizada;
     }
 
     public String getTipoMueble() {
