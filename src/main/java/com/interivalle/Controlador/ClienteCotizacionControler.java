@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.interivalle.Controlador;
+import com.interivalle.DTO.AprobarCotizacionRequest;
 import com.interivalle.DTO.CotizacionBaseResponse;
 import com.interivalle.DTO.CotizacionResponse;
 import com.interivalle.DTO.CotizacionVistaCompletaResponse;
@@ -14,7 +15,10 @@ import com.interivalle.Servicio.CotizacionService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -98,5 +102,21 @@ public class ClienteCotizacionControler {
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         return cotizacionService.obtenerVistaCompleta(usuario.getIdUsuario(), idCotizacion);
+        }
+        
+        @PutMapping("/{idCotizacion}/aprobar")
+        public ResponseEntity<CotizacionResponse> aprobar(
+               // @AuthenticationPrincipal UserDetails userDetails,
+                @PathVariable Integer idCotizacion,
+                 Authentication authentication,
+                @RequestBody AprobarCotizacionRequest req
+        ) {
+            String correo = authentication.getName();
+
+        Usuario usuario = usuarioRepo.findByCorreoUsuario(correo)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+            CotizacionResponse response = cotizacionService.aprobar(usuario.getIdUsuario(), idCotizacion, req);
+            return ResponseEntity.ok(response);
         }
 }

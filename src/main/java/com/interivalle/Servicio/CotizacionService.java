@@ -1,5 +1,6 @@
 package com.interivalle.Servicio;
 
+import com.interivalle.DTO.AprobarCotizacionRequest;
 import com.interivalle.DTO.CotizacionVistaCompletaResponse;
 import com.interivalle.DTO.CotizacionPersonalizadaDetalleResponse;
 import com.interivalle.DTO.CotizacionActividadResponse;
@@ -43,9 +44,11 @@ import com.interivalle.Repositorio.CotizacionVidrioRepositorio;
 import com.interivalle.Repositorio.ServiciosRepositorio;
 import com.interivalle.Repositorio.SolicitudRepositorio;
 import com.interivalle.Repositorio.UsuarioRepositorio;
+import com.interivalle.Servicio.CronogramaService;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -81,6 +84,7 @@ public class CotizacionService {
     @Autowired private CotizacionCarpinteriaRepositorio cotizacionCarpinteriaRepo;
     @Autowired private CotizacionVidrioRepositorio cotizacionVidrioRepo;
     @Autowired private CotizacionMezonRepositorio cotizacionMezonRepo;
+    @Autowired private CronogramaService cronogramaServicio;
 
     // =========================================================
     // CREA COTIZACION MANUAL
@@ -105,7 +109,7 @@ public class CotizacionService {
         Cotizacion cot = new Cotizacion();
         cot.setSolicitud(solicitud);
         cot.setTipo(req.getTipo());
-        cot.setEstado(EstadoCotizacion.BORRADOR);
+        cot.setEstado(EstadoCotizacion.GENERADA);
         cot.setCreadaPor(usuario);
 
         cot = cotizacionRepo.save(cot);
@@ -158,7 +162,7 @@ public class CotizacionService {
 
         cot = cotizacionRepo.save(cot);
 
-        guardarHistorial(cot, null, EstadoCotizacion.BORRADOR, usuario);
+        guardarHistorial(cot, null, EstadoCotizacion.GENERADA, usuario);
 
         return toResponseCompleto(cot);
     }
@@ -190,8 +194,8 @@ public class CotizacionService {
     public CotizacionResponse enviar(Integer idUsuario, Integer idCotizacion) {
         Cotizacion cot = getCotizacionDelUsuario(idUsuario, idCotizacion);
 
-        if (cot.getEstado() != EstadoCotizacion.BORRADOR) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo puedes enviar cotizaciones en BORRADOR");
+        if (cot.getEstado() != EstadoCotizacion.GENERADA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo puedes enviar cotizaciones en GENERADA");
         }
 
         Usuario usuario = usuarioRepo.findById(idUsuario)
@@ -206,39 +210,49 @@ public class CotizacionService {
         return toResponseCompleto(cot);
     }
 
-    // =========================================================
     // APROBAR
-    // =========================================================
     @Transactional
-    public CotizacionResponse aprobar(Integer idUsuario, Integer idCotizacion, ObservacionRequest req) {
+    public CotizacionResponse aprobar(Integer idUsuario, Integer idCotizacion, AprobarCotizacionRequest req) {
         Cotizacion cot = getCotizacionDelUsuario(idUsuario, idCotizacion);
 
-        if (cot.getEstado() != EstadoCotizacion.ENVIADA && cot.getEstado() != EstadoCotizacion.EN_REVISION) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo puedes aprobar cotizaciones ENVIADA o EN_REVISION");
+        if (cot.getEstado() != EstadoCotizacion.GENERADA && cot.getEstado() != EstadoCotizacion.EN_REVISION) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Solo puedes aprobar cotizaciones GENERADA o EN_REVISION"
+            );
+        }
+
+        if (req == null || req.getFechaInicio() == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "La fechaInicio es obligatoria para generar el cronograma"
+            );
         }
 
         Usuario usuario = usuarioRepo.findById(idUsuario)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
         EstadoCotizacion anterior = cot.getEstado();
+
         cot.setEstado(EstadoCotizacion.APROBADA);
+        cot.setFechaAprobacion(LocalDateTime.now());
         cot = cotizacionRepo.save(cot);
 
         guardarObservacion(cot, usuario, TipoObservacion.APROBACION, req.getMensaje());
         guardarHistorial(cot, anterior, EstadoCotizacion.APROBADA, usuario);
 
+        cronogramaServicio.crearDesdeCotizacionAprobada(cot.getIdCotizacion(), req.getFechaInicio());
+
         return toResponseCompleto(cot);
     }
 
-    // =========================================================
     // RECHAZAR
-    // =========================================================
     @Transactional
     public CotizacionResponse rechazar(Integer idUsuario, Integer idCotizacion, ObservacionRequest req) {
         Cotizacion cot = getCotizacionDelUsuario(idUsuario, idCotizacion);
 
-        if (cot.getEstado() != EstadoCotizacion.ENVIADA && cot.getEstado() != EstadoCotizacion.EN_REVISION) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo puedes rechazar cotizaciones ENVIADA o EN_REVISION");
+        if (cot.getEstado() != EstadoCotizacion.GENERADA && cot.getEstado() != EstadoCotizacion.EN_REVISION) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo puedes rechazar cotizaciones GENERADA o EN_REVISION");
         }
 
         Usuario usuario = usuarioRepo.findById(idUsuario)
@@ -254,9 +268,7 @@ public class CotizacionService {
         return toResponseCompleto(cot);
     }
 
-    // =========================================================
     // GENERAR COTIZACION BASE DESDE SOLICITUD + GUARDAR FORMULARIOS
-    // =========================================================
     @Transactional
     public CotizacionBaseResponse generarCotizacionBaseDesdeSolicitud(Integer idUsuario, GenerarCotizacionBaseRequest req) {
 
@@ -306,7 +318,7 @@ public class CotizacionService {
         cot.setSolicitud(solicitud);
         cot.setCreadaPor(usuario);
         cot.setTipo(TipoCotizacion.BASE);
-        cot.setEstado(EstadoCotizacion.BORRADOR);
+        cot.setEstado(EstadoCotizacion.GENERADA);
         cot.setTotalManoObra(BigDecimal.ZERO);
         cot.setTotalMateriales(BigDecimal.ZERO);
         cot.setTotalProductos(BigDecimal.ZERO);
@@ -314,7 +326,7 @@ public class CotizacionService {
 
         cot = cotizacionRepo.save(cot);
 
-        guardarHistorial(cot, null, EstadoCotizacion.BORRADOR, usuario);
+        guardarHistorial(cot, null, EstadoCotizacion.GENERADA, usuario);
 
         if (req.getManoObra() != null) {
             CotizacionManoObra mano = new CotizacionManoObra();
@@ -355,9 +367,8 @@ public class CotizacionService {
             cotizacionMezonRepo.save(mezon);
         }
 
-        // =====================================================
+
         // GENERAR DETALLES DESDE CATALOGO + ACTIVIDAD_MATERIAL
-        // =====================================================
         BigDecimal totalManoObra = BigDecimal.ZERO;
         BigDecimal totalMateriales = BigDecimal.ZERO;
         BigDecimal totalProductos = BigDecimal.ZERO;
@@ -536,9 +547,7 @@ public class CotizacionService {
             return rel.getCantidad();
         }
 
-    // =========================================================
     // HELPERS DE NEGOCIO + VALIDACION
-    // =========================================================
     private void validarItem(CrearCotizacionRequest.DetalleItem item) {
         if (item.getTipoItem() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tipoItem es obligatorio");
@@ -572,15 +581,14 @@ public class CotizacionService {
     private void guardarHistorial(Cotizacion cot, EstadoCotizacion anterior, EstadoCotizacion nuevo, Usuario usuario) {
         CotizacionHistorialEstado h = new CotizacionHistorialEstado();
         h.setCotizacion(cot);
-        h.setEstadoAnterior(anterior == null ? EstadoCotizacion.BORRADOR : anterior);
+        h.setEstadoAnterior(anterior == null ? EstadoCotizacion.GENERADA : anterior);
         h.setEstadoNuevo(nuevo);
         h.setCambiadoPor(usuario);
         histRepo.save(h);
     }
 
-    // =========================================================
+
     // MAPPERS -> RESPONSE DTOs
-    // =========================================================
     private CotizacionResponse toResponseBasico(Cotizacion cot) {
         CotizacionResponse r = new CotizacionResponse();
         r.setIdCotizacion(cot.getIdCotizacion());
@@ -779,9 +787,9 @@ public class CotizacionService {
             totalAdicionales = personalizada.getTotal();
         }
     } catch (Exception e) {
-        //personalizada = null;
-        //totalAdicionales = BigDecimal.ZERO;
-        e.printStackTrace();
+        personalizada = null;
+        totalAdicionales = BigDecimal.ZERO;
+       // e.printStackTrace();
      throw e;
     }
 
@@ -809,4 +817,20 @@ public class CotizacionService {
 
     return resp;
     }
+    
+    ///VALIDAR COTIZACION ANTES DE EDITAR    
+    private void validarCotizacionEditable(Cotizacion cotizacion) {
+        if (cotizacion == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cotización no encontrada");
+        }
+
+        if (cotizacion.getEstado() == EstadoCotizacion.APROBADA ||
+            cotizacion.getEstado() == EstadoCotizacion.RECHAZADA) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "La cotización no se puede modificar porque está en estado " + cotizacion.getEstado().name()
+            );
+        }
+    }
+    
 }

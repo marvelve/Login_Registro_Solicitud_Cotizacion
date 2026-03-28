@@ -19,4 +19,6 @@ public interface CotizacionDetalleRepositorio extends JpaRepository<CotizacionDe
 
     // Útil si quieres ordenar desde BD (opcional)
     List<CotizacionDetalle> findByCotizacion_IdCotizacionOrderByServicio_NombreServicioAsc(Integer idCotizacion);
+    
+    List<CotizacionDetalle> findByCotizacion_IdCotizacionOrderBySemanaAsc(Integer idCotizacion);
 }

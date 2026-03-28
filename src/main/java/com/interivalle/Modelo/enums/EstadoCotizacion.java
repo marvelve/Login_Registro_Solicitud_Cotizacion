@@ -11,7 +11,7 @@ package com.interivalle.Modelo.enums;
  */
 public enum EstadoCotizacion {
 
-    BORRADOR,
+    GENERADA,
     ENVIADA,
     APROBADA,
     RECHAZADA,
@@ -22,7 +22,7 @@ public enum EstadoCotizacion {
      */
     public boolean puedeCambiarA(EstadoCotizacion nuevoEstado) {
 
-        if (this == BORRADOR && nuevoEstado == ENVIADA) return true;
+        if (this == GENERADA && nuevoEstado == ENVIADA) return true;
 
         if (this == ENVIADA &&
                 (nuevoEstado == APROBADA ||

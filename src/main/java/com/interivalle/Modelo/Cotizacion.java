@@ -37,7 +37,7 @@ public class Cotizacion {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
-    private EstadoCotizacion estado = EstadoCotizacion.BORRADOR;
+    private EstadoCotizacion estado = EstadoCotizacion.GENERADA;
 
     // Totales separados (según tus imágenes)
     @Column(name = "total_mano_obra", nullable = false)
@@ -68,6 +68,9 @@ public class Cotizacion {
 
     @Column(name = "fecha_actualizacion", nullable = false)
     private LocalDateTime fechaActualizacion;
+    
+    @Column(name = "fecha_aprobacion")
+    private LocalDateTime fechaAprobacion;
 
     // Evitar ciclos JSON si por error serializas entidades
     @JsonIgnore
@@ -90,7 +93,7 @@ public class Cotizacion {
         if (this.totalMateriales == null) this.totalMateriales = BigDecimal.ZERO;
         if (this.totalProductos == null) this.totalProductos = BigDecimal.ZERO;
         if (this.totalEstimado == null) this.totalEstimado = BigDecimal.ZERO;
-        if (this.estado == null) this.estado = EstadoCotizacion.BORRADOR;
+        if (this.estado == null) this.estado = EstadoCotizacion.GENERADA;
     }
 
     @PreUpdate
@@ -141,4 +144,14 @@ public class Cotizacion {
 
     public List<CotizacionHistorialEstado> getHistorialEstados() { return historialEstados; }
     public void setHistorialEstados(List<CotizacionHistorialEstado> historialEstados) { this.historialEstados = historialEstados; }
+
+    public LocalDateTime getFechaAprobacion() {
+        return fechaAprobacion;
+    }
+
+    public void setFechaAprobacion(LocalDateTime fechaAprobacion) {
+        this.fechaAprobacion = fechaAprobacion;
+    }
+    
+    
 }
