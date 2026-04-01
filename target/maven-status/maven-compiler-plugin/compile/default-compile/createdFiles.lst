@@ -6,6 +6,7 @@ com\interivalle\Modelo\CatalogoItem.class
 com\interivalle\Controlador\ObraBlancaControler.class
 com\interivalle\Modelo\Solicitud.class
 com\interivalle\Repositorio\CarpinteriaRepositorio.class
+com\interivalle\Controlador\CronogramaControler.class
 com\interivalle\Repositorio\VidrioRepositorio.class
 com\interivalle\Repositorio\MesonGranitoRepositorio.class
 com\interivalle\Repositorio\CotizacionMezonRepositorio.class
@@ -34,6 +35,7 @@ com\interivalle\DTO\CotizacionDetalleResponse.class
 com\interivalle\Modelo\CotizacionManoObra.class
 com\interivalle\Controlador\CarpinteriaControler.class
 com\interivalle\Modelo\CotizacionObservacion.class
+com\interivalle\DTO\CronogramaVistaResponse.class
 com\interivalle\Controlador\AuthControler.class
 com\interivalle\DTO\ObraBlancaRequest.class
 com\interivalle\DTO\CronogramaDetalleResponse.class
@@ -50,6 +52,7 @@ com\interivalle\Controlador\SolicitudControler.class
 com\interivalle\DTO\LoginRequest.class
 com\interivalle\Repositorio\ActividadMaterialRepositorio.class
 com\interivalle\DTO\CotizacionObservacionResponse.class
+com\interivalle\DTO\SemanaCronogramaDTO.class
 com\interivalle\Modelo\ObraBlanca.class
 com\interivalle\DTO\CrearCronogramaRequest.class
 com\interivalle\Controlador\AdminUsuarioControler.class
@@ -64,6 +67,7 @@ com\interivalle\Repositorio\CotizacionVidrioRepositorio.class
 com\interivalle\DTO\UsuarioCreateRequest.class
 com\interivalle\DTO\CotizacionPersonalizadaResponse.class
 com\interivalle\DTO\CarpinteriaResponse.class
+com\interivalle\DTO\CronogramaDetalleVistaDTO.class
 com\interivalle\Modelo\CotizacionMezon.class
 com\interivalle\DTO\SolicitudResponse.class
 com\interivalle\Servicio\AdminUsuarioServicio.class

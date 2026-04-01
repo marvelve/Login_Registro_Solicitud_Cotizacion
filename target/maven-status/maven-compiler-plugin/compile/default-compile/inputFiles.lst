@@ -5,6 +5,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CarpinteriaControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\ClienteCotizacionControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CotizacionPersonalizadaControler.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CronogramaControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\MesonGranitoControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\ObraBlancaControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\SolicitudControler.java
@@ -30,7 +31,9 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CrearCo
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CrearCronogramaRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CrearSolicitud.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CronogramaDetalleResponse.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CronogramaDetalleVistaDTO.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CronogramaResponse.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CronogramaVistaResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\EnviarSolicitud.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\EstadoUpdate.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\GenerarCotizacionBaseRequest.java
@@ -44,6 +47,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ObraBla
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ObservacionRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\RegisterRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\RolUpdate.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\SemanaCronogramaDTO.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\SolicitudResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\SolicitudServicioItem.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\UsuarioCreateRequest.java

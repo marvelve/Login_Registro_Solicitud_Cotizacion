@@ -24,4 +24,5 @@ public interface CotizacionPersonalizadaRepositorio extends JpaRepository<Cotiza
 
     Optional<CotizacionPersonalizada> findTopByCotizacion_IdCotizacionOrderByIdCotizacionPersonalizadaDesc(Integer idCotizacion);
     
+    
 }

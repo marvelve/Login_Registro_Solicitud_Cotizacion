@@ -15,6 +15,7 @@ public class ObraBlancaResponse {
     private Integer idObraBlanca;
     private Integer idCotizacionPersonalizada;
     private Integer idCotizacion;
+    private Integer idActividad;
     private String actividad;
     private String lugar;
     private String unidad;
@@ -48,6 +49,14 @@ public class ObraBlancaResponse {
 
     public void setIdCotizacion(Integer idCotizacion) {
         this.idCotizacion = idCotizacion;
+    }
+
+    public Integer getIdActividad() {
+        return idActividad;
+    }
+
+    public void setIdActividad(Integer idActividad) {
+        this.idActividad = idActividad;
     }
 
     public String getActividad() {

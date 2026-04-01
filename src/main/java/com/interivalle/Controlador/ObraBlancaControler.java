@@ -6,8 +6,8 @@ package com.interivalle.Controlador;
 
 import com.interivalle.DTO.ObraBlancaRequest;
 import com.interivalle.DTO.ObraBlancaResponse;
-import com.interivalle.Modelo.ObraBlanca;
 import com.interivalle.Servicio.ObraBlancaService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ public class ObraBlancaControler {
 
     // GUARDAR
     @PostMapping
-    public ObraBlancaResponse guardar(@RequestBody ObraBlancaRequest req) {
+    public ObraBlancaResponse guardar(@Valid @RequestBody ObraBlancaRequest req) {
         return obraBlancaService.guardar(req);
     }
 
@@ -44,7 +44,7 @@ public class ObraBlancaControler {
 
     // ACTUALIZAR
     @PutMapping("/{id}")
-    public ObraBlancaResponse actualizar(@PathVariable Integer id, @RequestBody ObraBlancaRequest req) {
+    public ObraBlancaResponse actualizar(@PathVariable Integer id, @Valid @RequestBody ObraBlancaRequest req) {
         return obraBlancaService.actualizar(id, req);
     }
 

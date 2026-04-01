@@ -56,6 +56,10 @@ public class CronogramaDetalle {
 
     @Column(name = "novedades", length = 1000)
     private String novedades;
+    
+    @Column(name = "estado")
+    private String estado;
+            
 
     public Integer getIdCronogramaDetalle() {
         return idCronogramaDetalle;
@@ -152,4 +156,14 @@ public class CronogramaDetalle {
     public void setNovedades(String novedades) {
         this.novedades = novedades;
     }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+    
+    
 }

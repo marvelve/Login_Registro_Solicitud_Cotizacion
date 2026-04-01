@@ -11,15 +11,28 @@ import java.math.BigDecimal;
  * @author mary_
  */
 
+
 @Entity
-@Table(name = "obra_blanca")
+@Table(
+    name = "obra_blanca",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_obra_blanca_cotizacion_actividad_lugar",
+            columnNames = {
+                "id_cotizacion_personalizada",
+                "id_actividad",
+                "lugar_normalizado"
+            }
+        )
+    }
+)
 public class ObraBlanca {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_obra_blanca")
     private Integer idObraBlanca;
-    
+
     @ManyToOne
     @JoinColumn(name = "id_cotizacion_personalizada")
     private CotizacionPersonalizada cotizacionPersonalizada;
@@ -27,8 +40,14 @@ public class ObraBlanca {
     @Column(name = "actividad", length = 100)
     private String actividad;
 
+    @Column(name = "id_actividad")
+    private Integer idActividad;
+
     @Column(name = "lugar", length = 100)
     private String lugar;
+
+    @Column(name = "lugar_normalizado", length = 100)
+    private String lugarNormalizado;
 
     @Column(name = "unidad", length = 30)
     private String unidad;
@@ -66,8 +85,8 @@ public class ObraBlanca {
         return cotizacionPersonalizada;
     }
 
-    public void setCotizacionPersonalizada(CotizacionPersonalizada cotizacionpersonalizada) {
-        this.cotizacionPersonalizada = cotizacionpersonalizada;
+    public void setCotizacionPersonalizada(CotizacionPersonalizada cotizacionPersonalizada) {
+        this.cotizacionPersonalizada = cotizacionPersonalizada;
     }
 
     public String getActividad() {
@@ -78,12 +97,28 @@ public class ObraBlanca {
         this.actividad = actividad;
     }
 
+    public Integer getIdActividad() {
+        return idActividad;
+    }
+
+    public void setIdActividad(Integer idActividad) {
+        this.idActividad = idActividad;
+    }
+
     public String getLugar() {
         return lugar;
     }
 
     public void setLugar(String lugar) {
         this.lugar = lugar;
+    }
+
+    public String getLugarNormalizado() {
+        return lugarNormalizado;
+    }
+
+    public void setLugarNormalizado(String lugarNormalizado) {
+        this.lugarNormalizado = lugarNormalizado;
     }
 
     public String getUnidad() {
