@@ -58,7 +58,9 @@ com\interivalle\DTO\CrearCronogramaRequest.class
 com\interivalle\Controlador\AdminUsuarioControler.class
 com\interivalle\Security\JwtService.class
 com\interivalle\Modelo\ActividadPersonalizada.class
+com\interivalle\Repositorio\VisitaTecnicaRepositorio.class
 com\interivalle\Repositorio\CatalogoItemRepositorio.class
+com\interivalle\DTO\SolicitudRequest.class
 com\interivalle\Modelo\CotizacionCarpinteria.class
 com\interivalle\Servicio\CotizacionService.class
 com\interivalle\Controlador\CotizacionPersonalizadaControler.class
@@ -98,6 +100,7 @@ com\interivalle\Servicio\AuthServicio.class
 com\interivalle\Modelo\CotizacionDetalle.class
 com\interivalle\Modelo\MesonGranito.class
 com\interivalle\DTO\AuthResponse.class
+com\interivalle\Modelo\VisitaTecnica.class
 com\interivalle\DTO\MesonGranitoResponse.class
 com\interivalle\Controlador\ActividadPersonalizadaControler.class
 com\interivalle\DTO\MesonGranitoRequest.class

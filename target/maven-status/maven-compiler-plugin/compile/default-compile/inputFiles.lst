@@ -48,6 +48,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\Observa
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\RegisterRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\RolUpdate.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\SemanaCronogramaDTO.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\SolicitudRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\SolicitudResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\SolicitudServicioItem.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\UsuarioCreateRequest.java
@@ -85,6 +86,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\Soli
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\SolicitudServicios.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\Usuario.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\Vidrio.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\VisitaTecnica.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\ActividadMaterialRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\ActividadPersonalizadaRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\CarpinteriaRepositorio.java
@@ -107,6 +109,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\SolicitudServiciosRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\UsuarioRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\VidrioRepositorio.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\VisitaTecnicaRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Security\JwtAuthFilter.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Security\JwtService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Security\SecurityConfig.java

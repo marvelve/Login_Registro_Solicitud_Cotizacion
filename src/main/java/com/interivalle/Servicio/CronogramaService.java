@@ -10,13 +10,17 @@ import com.interivalle.DTO.CronogramaResponse;
 import com.interivalle.DTO.CronogramaVistaResponse;
 import com.interivalle.DTO.SemanaCronogramaDTO;
 import com.interivalle.Modelo.Cotizacion;
+import com.interivalle.Modelo.CotizacionDetalle;
 import com.interivalle.Modelo.Cronograma;
 import com.interivalle.Modelo.CronogramaDetalle;
 import com.interivalle.Modelo.Solicitud;
+import com.interivalle.Modelo.enums.EstadoActividadCronograma;
+import com.interivalle.Modelo.enums.EstadoCronograma;
 import com.interivalle.Repositorio.CotizacionRepositorio;
 import com.interivalle.Repositorio.CronogramaDetalleRepositorio;
 import com.interivalle.Repositorio.CronogramaRepositorio;
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -133,7 +137,7 @@ public class CronogramaService {
             dto.setActividad(d.getActividad());
             dto.setDescripcion(d.getDescripcion());
             dto.setSemana(d.getSemana());
-            dto.setEstado(d.getEstado()!= null ? d.getEstado().toString() : "PENDIENTE");
+            dto.setEstado(d.getEstadoActividad()!= null ? d.getEstadoActividad().toString() : "PENDIENTE");
             dto.setTrabajador(d.getTrabajadorAsignado());
             dto.setPorcentaje(d.getPorcentaje() != null ? d.getPorcentaje().intValue() : 0);
             dto.setNovedades(d.getNovedades());
@@ -174,89 +178,114 @@ public class CronogramaService {
 }
     
     @Transactional
-public CronogramaResponse crearCronograma(CrearCronogramaRequest req) {
+    public CronogramaResponse crearCronograma(CrearCronogramaRequest req) {
 
-    if (req == null || req.getIdCotizacion() == null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La cotización es obligatoria");
-    }
-
-    if (req.getFechaInicio() == null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de inicio es obligatoria");
-    }
-
-    Cotizacion cotizacion = cotizacionRepo.findById(req.getIdCotizacion())
-            .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Cotización no encontrada"));
-
-    Optional<Cronograma> existente = cronogramaRepo.findByCotizacion_IdCotizacion(req.getIdCotizacion());
-    if (existente.isPresent()) {
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Ya existe un cronograma para esta cotización"
-        );
-    }
-
-    Cronograma cronograma = new Cronograma();
-    cronograma.setCotizacion(cotizacion);
-    cronograma.setFechaInicio(req.getFechaInicio());
-
-    LocalDate inicioPlanificado = req.getFechaInicio();
-    while (inicioPlanificado.getDayOfWeek() != java.time.DayOfWeek.MONDAY) {
-        inicioPlanificado = inicioPlanificado.plusDays(1);
-    }
-
-    cronograma.setFechaInicioPlanificada(inicioPlanificado);
-
-    List<com.interivalle.Modelo.CotizacionDetalle> detallesCotizacion =
-            cotizacion.getDetalles();
-
-    int maxSemana = 0;
-    if (detallesCotizacion != null && !detallesCotizacion.isEmpty()) {
-        maxSemana = detallesCotizacion.stream()
-                .map(com.interivalle.Modelo.CotizacionDetalle::getSemana)
-                .filter(s -> s != null)
-                .max(Integer::compareTo)
-                .orElse(0);
-    }
-
-    if (maxSemana > 0) {
-        cronograma.setFechaFinEstimada(inicioPlanificado.plusWeeks(maxSemana - 1).plusDays(5));
-    } else {
-        cronograma.setFechaFinEstimada(inicioPlanificado.plusDays(5));
-    }
-
-    if (cronograma.getEstadoCronograma() == null) {
-        cronograma.setEstadoCronograma(com.interivalle.Modelo.enums.EstadoCronograma.EN_PROCESO);
-    }
-
-    Cronograma guardado = cronogramaRepo.save(cronograma);
-
-    if (detallesCotizacion != null) {
-        for (com.interivalle.Modelo.CotizacionDetalle det : detallesCotizacion) {
-            CronogramaDetalle cd = new CronogramaDetalle();
-            cd.setCronograma(guardado);
-            cd.setActividad(det.getActividadMaterial() != null ? det.getActividadMaterial() : det.getDescripcion());
-            cd.setDescripcion(det.getDescripcion());
-            cd.setSemana(det.getSemana());
-            cd.setEstado(com.interivalle.Modelo.enums.EstadoCronograma.EN_PROCESO.toString());
-            cd.setPorcentaje(java.math.BigDecimal.ZERO);
-            cd.setTrabajadorAsignado(null);
-            cd.setNovedades(null);
-
-            cronogramaDetalleRepo.save(cd);
+        if (req == null || req.getIdCotizacion() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La cotización es obligatoria");
         }
+
+        if (req.getFechaInicio() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de inicio es obligatoria");
+        }
+
+        Cotizacion cotizacion = cotizacionRepo.findById(req.getIdCotizacion())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Cotización no encontrada"));
+
+        Optional<Cronograma> existente = cronogramaRepo.findByCotizacion_IdCotizacion(req.getIdCotizacion());
+        if (existente.isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ya existe un cronograma para esta cotización"
+            );
+        }
+
+        Cronograma cronograma = new Cronograma();
+        cronograma.setCotizacion(cotizacion);
+        cronograma.setFechaInicio(req.getFechaInicio());
+
+        LocalDate inicioPlanificado = req.getFechaInicio();
+        while (inicioPlanificado.getDayOfWeek() != java.time.DayOfWeek.MONDAY) {
+            inicioPlanificado = inicioPlanificado.plusDays(1);
+        }
+
+        cronograma.setFechaInicioPlanificada(inicioPlanificado);
+
+        List<CotizacionDetalle> detallesCotizacion = cotizacion.getDetalles();
+
+        int maxSemana = 0;
+        if (detallesCotizacion != null && !detallesCotizacion.isEmpty()) {
+            maxSemana = detallesCotizacion.stream()
+                    .map(CotizacionDetalle::getSemana)
+                    .filter(s -> s != null)
+                    .max(Integer::compareTo)
+                    .orElse(0);
+        }
+
+        int totalSemanas = (maxSemana > 0) ? maxSemana : 1;
+        cronograma.setTotalSemanas(totalSemanas);
+
+        cronograma.setFechaFinEstimada(
+                inicioPlanificado.plusWeeks(totalSemanas - 1).plusDays(5)
+        );
+
+        if (cronograma.getEstadoCronograma() == null) {
+            cronograma.setEstadoCronograma(EstadoCronograma.EN_PROCESO);
+        }
+
+        Cronograma guardado = cronogramaRepo.save(cronograma);
+
+        if (detallesCotizacion != null && !detallesCotizacion.isEmpty()) {
+            for (CotizacionDetalle det : detallesCotizacion) {
+
+                if (det.getTipoItem() == null || !"ACTIVIDAD".equals(det.getTipoItem().name())) {
+            continue;
+        }
+                Integer semanaDetalle = (det.getSemana() != null && det.getSemana() > 0)
+                        ? det.getSemana()
+                        : 1;
+
+                LocalDate fechaInicioSemana = inicioPlanificado.plusWeeks(semanaDetalle - 1);
+                LocalDate fechaFinSemana = fechaInicioSemana.plusDays(5);
+
+                CronogramaDetalle cd = new CronogramaDetalle();
+                cd.setCronograma(guardado);
+
+                cd.setServicio(
+                        det.getServicio() != null
+                                ? det.getServicio().getNombreServicio()
+                                : "Sin servicio"
+                );
+
+                cd.setActividad(
+                    det.getDescripcion() != null && !det.getDescripcion().isBlank()
+                ? det.getDescripcion()
+                : "Actividad"
+                );
+
+                cd.setDescripcion(det.getDescripcion());
+                cd.setSemana(semanaDetalle);
+                cd.setFechaInicioSemana(fechaInicioSemana);
+                cd.setFechaFinSemana(fechaFinSemana);
+                cd.setTrabajadorAsignado(null);
+                cd.setEstadoActividad(EstadoActividadCronograma.PENDIENTE);
+                cd.setPorcentaje(BigDecimal.ZERO);
+                cd.setNovedades(null);
+
+                cronogramaDetalleRepo.save(cd);
+            }
+        }
+
+        CronogramaResponse response = new CronogramaResponse();
+        response.setIdCronograma(guardado.getIdCronograma());
+        response.setFechaInicio(guardado.getFechaInicio());
+        response.setFechaFinEstimada(guardado.getFechaFinEstimada());
+        response.setEstadoCronograma(
+                guardado.getEstadoCronograma() != null
+                        ? guardado.getEstadoCronograma().name()
+                        : "EN_PROCESO"
+        );
+
+        return response;
     }
-
-    CronogramaResponse response = new CronogramaResponse();
-    response.setIdCronograma(guardado.getIdCronograma());
-    response.setFechaInicio(guardado.getFechaInicio());
-    response.setFechaFinEstimada(guardado.getFechaFinEstimada());
-    response.setEstadoCronograma(
-            guardado.getEstadoCronograma() != null
-                    ? guardado.getEstadoCronograma().name()
-                    : "EN_PROCESO"
-    );
-
-    return response;
-}
 }

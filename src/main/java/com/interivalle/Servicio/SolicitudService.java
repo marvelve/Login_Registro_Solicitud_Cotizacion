@@ -7,13 +7,16 @@ import com.interivalle.Modelo.Solicitud;
 import com.interivalle.Modelo.SolicitudServicios;
 import com.interivalle.Modelo.Servicios;
 import com.interivalle.Modelo.Usuario;
+import com.interivalle.Modelo.VisitaTecnica;
 import com.interivalle.Repositorio.SolicitudRepositorio;
 import com.interivalle.Repositorio.SolicitudServiciosRepositorio;
 import com.interivalle.Repositorio.ServiciosRepositorio;
 import com.interivalle.Repositorio.UsuarioRepositorio;
+import com.interivalle.Repositorio.VisitaTecnicaRepositorio;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,8 @@ import org.springframework.web.server.ResponseStatusException;
  *
  * @author mary_
  */
+
+
 @Service
 public class SolicitudService {
 
@@ -33,6 +38,7 @@ public class SolicitudService {
     @Autowired private SolicitudRepositorio solicitudRepo;
     @Autowired private ServiciosRepositorio serviciosRepo;
     @Autowired private SolicitudServiciosRepositorio solicitudServicioRepo;
+    @Autowired private VisitaTecnicaRepositorio visitaTecnicaRepo;
 
     @Transactional
     public SolicitudResponse crearSolicitud(CrearSolicitud dto) {
@@ -47,10 +53,61 @@ public class SolicitudService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tipoSolicitud es requerido");
         }
 
-        // Validar servicios SOLO para cotización base
-        if ("COTIZACION_BASE".equalsIgnoreCase(dto.getTipoSolicitud())) {
+        String tipoSolicitud = dto.getTipoSolicitud().trim().toUpperCase();
+
+        if ("COTIZACION_BASE".equals(tipoSolicitud)) {
             if (dto.getServicios() == null || dto.getServicios().isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe seleccionar al menos un servicio");
+            }
+        }
+
+        if ("VISITA_TECNICA".equals(tipoSolicitud)) {
+            if (dto.getFechaVisita() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fechaVisita es requerida");
+            }
+
+            if (!dto.getFechaVisita().isAfter(LocalDate.now())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de visita debe ser futura");
+            }
+
+            if (dto.getHoraVisita() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "horaVisita es requerida");
+            }
+
+            LocalTime hora = dto.getHoraVisita();
+
+            boolean horaValida =
+                    (!hora.isBefore(LocalTime.of(8, 0)) && !hora.isAfter(LocalTime.of(12, 0))) ||
+                    (!hora.isBefore(LocalTime.of(14, 0)) && !hora.isAfter(LocalTime.of(17, 0)));
+
+            if (!horaValida) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "La hora de visita debe estar entre 08:00-12:00 o 14:00-17:00"
+                );
+            }
+
+            if (dto.getDireccionVisita() == null || dto.getDireccionVisita().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "direccionVisita es requerida");
+            }
+
+            if (dto.getCelularCliente() == null || dto.getCelularCliente().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "celularCliente es requerido");
+            }
+            
+            boolean visitaExistente = visitaTecnicaRepo
+            .existsBySolicitud_Usuario_CorreoUsuarioAndSolicitud_NombreProyectoUsuarioAndFechaVisitaAndHoraVisita(
+                    dto.getCorreoUsuario(),
+                    dto.getNombreProyecto().trim(),
+                    dto.getFechaVisita(),
+                    dto.getHoraVisita()
+            );
+
+            if (visitaExistente) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Ya existe una visita técnica para este proyecto en la misma fecha y hora"
+                );
             }
         }
 
@@ -60,15 +117,13 @@ public class SolicitudService {
         Solicitud solicitud = new Solicitud();
         solicitud.setUsuario(usuario);
         solicitud.setNombreProyectoUsuario(dto.getNombreProyecto().trim());
-        solicitud.setTipoSolicitud(dto.getTipoSolicitud().trim());
+        solicitud.setTipoSolicitud(tipoSolicitud);
         solicitud.setEstado("PENDIENTE");
         solicitud.setFechaSolicitud(LocalDate.now());
 
         solicitud = solicitudRepo.save(solicitud);
 
-        // Crear detalles (solo en COTIZACION_BASE)
-        if ("COTIZACION_BASE".equalsIgnoreCase(dto.getTipoSolicitud())) {
-
+        if ("COTIZACION_BASE".equals(tipoSolicitud)) {
             for (Integer idServicio : dto.getServicios()) {
 
                 long existe = solicitudServicioRepo.existeServicioEnProyecto(
@@ -100,6 +155,18 @@ public class SolicitudService {
             }
         }
 
+        if ("VISITA_TECNICA".equals(tipoSolicitud)) {
+            VisitaTecnica visita = new VisitaTecnica();
+            visita.setSolicitud(solicitud);
+            visita.setFechaVisita(dto.getFechaVisita());
+            visita.setHoraVisita(dto.getHoraVisita());
+            visita.setDireccionVisita(dto.getDireccionVisita().trim());
+            visita.setCelularCliente(dto.getCelularCliente().trim());
+            visita.setEstadoVisita("PENDIENTE");
+
+            visitaTecnicaRepo.save(visita);
+        }
+
         return buildResponseFromSolicitud(solicitud.getIdSolicitud());
     }
 
@@ -111,7 +178,6 @@ public class SolicitudService {
     }
 
     @Transactional
-
     public SolicitudResponse generarCotizacion(Integer idSolicitud) {
         Solicitud solicitud = solicitudRepo.findById(idSolicitud)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
@@ -120,6 +186,12 @@ public class SolicitudService {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Solo se puede generar cotización para solicitudes en estado PENDIENTE"
+            );
+        }
+        if (!"COTIZACION_BASE".equalsIgnoreCase(solicitud.getTipoSolicitud())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Solo las solicitudes de tipo COTIZACION_BASE pueden generar cotización"
             );
         }
 
