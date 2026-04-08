@@ -52,6 +52,14 @@ public class SolicitudControler {
 
         return service.listarTodas();
     }
+    
+    @PutMapping("/{idSolicitud}/reprogramar")
+    public ResponseEntity<SolicitudResponse> reprogramarVisita(
+            @PathVariable Integer idSolicitud,
+            @RequestBody ReprogramarVisitaRequest req) {
+
+        return ResponseEntity.ok(service.reprogramarVisita(idSolicitud, req));
+    }
 }
 
 

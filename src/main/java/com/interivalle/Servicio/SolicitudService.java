@@ -1,6 +1,7 @@
 package com.interivalle.Servicio;
 
 import com.interivalle.DTO.CrearSolicitud;
+import com.interivalle.DTO.ReprogramarVisitaRequest;
 import com.interivalle.DTO.SolicitudResponse;
 import com.interivalle.DTO.SolicitudServicioItem;
 import com.interivalle.Modelo.Solicitud;
@@ -18,6 +19,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +109,33 @@ public class SolicitudService {
                 throw new ResponseStatusException(
                         HttpStatus.CONFLICT,
                         "Ya existe una visita técnica para este proyecto en la misma fecha y hora"
+                );
+            }
+            
+            boolean yaExisteVisitaMismaHora = visitaTecnicaRepo
+            .existsBySolicitud_Usuario_CorreoUsuarioAndFechaVisitaAndHoraVisita(
+                dto.getCorreoUsuario(),
+                dto.getFechaVisita(),
+                dto.getHoraVisita()
+            );
+
+            if (yaExisteVisitaMismaHora) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya tienes una visita técnica agendada para esa fecha y hora"
+                );
+            }
+            
+            Optional<VisitaTecnica> visitaExistenteProyecto = visitaTecnicaRepo
+                .findBySolicitud_Usuario_CorreoUsuarioAndSolicitud_NombreProyectoUsuario(
+                    dto.getCorreoUsuario(),
+                    dto.getNombreProyecto().trim()
+                );
+
+            if (visitaExistenteProyecto.isPresent()) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya existe una visita técnica para este proyecto. Debe reprogramarla y no crear una nueva."
                 );
             }
         }
@@ -200,6 +229,16 @@ public class SolicitudService {
 
         return buildResponseFromSolicitud(solicitud.getIdSolicitud());
     }
+    
+        private void cargarDatosVisitaTecnica(Solicitud solicitud, SolicitudResponse resp) {
+        if ("VISITA_TECNICA".equalsIgnoreCase(solicitud.getTipoSolicitud())) {
+            visitaTecnicaRepo.findBySolicitud_IdSolicitud(solicitud.getIdSolicitud())
+                .ifPresent(visita -> {
+                    resp.setFechaVisita(visita.getFechaVisita());
+                    resp.setHoraVisita(visita.getHoraVisita());
+                });
+        }
+    }
 
     private SolicitudResponse toResponse(Solicitud solicitud) {
 
@@ -229,6 +268,8 @@ public class SolicitudService {
 
             dto.setSolicitudServicios(servicios);
         }
+
+        cargarDatosVisitaTecnica(solicitud, dto);
 
         return dto;
     }
@@ -276,6 +317,88 @@ public class SolicitudService {
 
         resp.setSolicitudServicios(items);
 
+        cargarDatosVisitaTecnica(solicitud, resp);
+
         return resp;
     }
+    
+    @Transactional
+    public SolicitudResponse reprogramarVisita(Integer idSolicitud, ReprogramarVisitaRequest req) {
+
+        Solicitud solicitud = solicitudRepo.findById(idSolicitud)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
+
+        if (!"VISITA_TECNICA".equalsIgnoreCase(solicitud.getTipoSolicitud())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Solo se pueden reprogramar solicitudes de visita técnica"
+            );
+        }
+
+        if (!"PENDIENTE".equalsIgnoreCase(solicitud.getEstado()) &&
+            !"REPROGRAMADA".equalsIgnoreCase(solicitud.getEstado())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Solo se pueden reprogramar visitas en estado PENDIENTE o REPROGRAMADA"
+            );
+        }
+
+        if (req.getFechaVisita() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fechaVisita es requerida");
+        }
+
+        if (!req.getFechaVisita().isAfter(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha debe ser futura");
+        }
+
+        if (req.getHoraVisita() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "horaVisita es requerida");
+        }
+
+        LocalTime hora = req.getHoraVisita();
+
+        boolean horaValida =
+            (!hora.isBefore(LocalTime.of(8, 0)) && !hora.isAfter(LocalTime.of(12, 0))) ||
+            (!hora.isBefore(LocalTime.of(14, 0)) && !hora.isAfter(LocalTime.of(17, 0)));
+
+        if (!horaValida) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "La hora de visita debe estar entre 08:00-12:00 o 14:00-17:00"
+            );
+        }
+
+        VisitaTecnica visita = visitaTecnicaRepo.findBySolicitud_IdSolicitud(idSolicitud)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Visita técnica no encontrada"));
+
+        boolean yaExisteVisitaMismaHora = visitaTecnicaRepo
+            .existsBySolicitud_Usuario_CorreoUsuarioAndFechaVisitaAndHoraVisita(
+                solicitud.getUsuario().getCorreoUsuario(),
+                req.getFechaVisita(),
+                req.getHoraVisita()
+            );
+
+        boolean mismaFechaHora =
+            visita.getFechaVisita().equals(req.getFechaVisita()) &&
+            visita.getHoraVisita().equals(req.getHoraVisita());
+
+        if (yaExisteVisitaMismaHora && !mismaFechaHora) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Ya tienes una visita técnica agendada para esa fecha y hora"
+            );
+        }
+
+        visita.setFechaVisita(req.getFechaVisita());
+        visita.setHoraVisita(req.getHoraVisita());
+
+        solicitud.setEstado("REPROGRAMADA");
+        visita.setEstadoVisita("REPROGRAMADA");
+
+        visitaTecnicaRepo.save(visita);
+        solicitudRepo.save(solicitud);
+
+        return buildResponseFromSolicitud(idSolicitud);
+    }
+    
 }

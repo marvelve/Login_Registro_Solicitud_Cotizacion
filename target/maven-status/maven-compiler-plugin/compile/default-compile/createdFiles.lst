@@ -81,6 +81,7 @@ com\interivalle\Servicio\ObraBlancaService.class
 com\interivalle\Modelo\enums\TipoItemCotizacion.class
 com\interivalle\Modelo\Servicios.class
 com\interivalle\DTO\ManoObraBaseRequest.class
+com\interivalle\DTO\ReprogramarVisitaRequest.class
 com\interivalle\Servicio\SolicitudService.class
 com\interivalle\Repositorio\CotizacionCarpinteriaRepositorio.class
 com\interivalle\DTO\MezonBaseRequest.class

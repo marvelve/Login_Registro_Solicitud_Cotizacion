@@ -30,5 +30,16 @@ public interface VisitaTecnicaRepositorio extends JpaRepository<VisitaTecnica, I
             LocalDate fechaVisita,
             LocalTime horaVisita
     );
+    
+    boolean existsBySolicitud_Usuario_CorreoUsuarioAndFechaVisitaAndHoraVisita(
+        String correoUsuario,
+        LocalDate fechaVisita,
+        LocalTime horaVisita
+    );
+    
+    Optional<VisitaTecnica> findBySolicitud_Usuario_CorreoUsuarioAndSolicitud_NombreProyectoUsuario(
+        String correoUsuario,
+        String nombreProyectoUsuario
+    );
 
 }
