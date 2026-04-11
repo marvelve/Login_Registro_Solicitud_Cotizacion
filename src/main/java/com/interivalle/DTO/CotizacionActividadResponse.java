@@ -20,7 +20,8 @@ public class CotizacionActividadResponse {
     private BigDecimal totalMateriales;
     private BigDecimal totalProductos;
     private BigDecimal totalActividad;
-    private List<CotizacionDetalleResponse> items;
+   // private List<CotizacionDetalleResponse> items;
+    private List<ActividadAgrupadaResponse> actividades;
 
     public String getActividadMaterial() {
         return actividadMaterial;
@@ -70,11 +71,13 @@ public class CotizacionActividadResponse {
         this.totalActividad = totalActividad;
     }
 
-    public List<CotizacionDetalleResponse> getItems() {
-        return items;
+    public List<ActividadAgrupadaResponse> getActividades() {
+        return actividades;
     }
 
-    public void setItems(List<CotizacionDetalleResponse> items) {
-        this.items = items;
+    public void setActividades(List<ActividadAgrupadaResponse> actividades) {
+        this.actividades = actividades;
     }
+    
+    
 }

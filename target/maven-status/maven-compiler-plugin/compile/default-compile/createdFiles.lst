@@ -33,6 +33,7 @@ com\interivalle\DTO\ObservacionRequest.class
 com\interivalle\Repositorio\CronogramaRepositorio.class
 com\interivalle\DTO\CotizacionDetalleResponse.class
 com\interivalle\Modelo\CotizacionManoObra.class
+com\interivalle\DTO\ActividadAgrupadaResponse.class
 com\interivalle\Controlador\CarpinteriaControler.class
 com\interivalle\Modelo\CotizacionObservacion.class
 com\interivalle\DTO\CronogramaVistaResponse.class
@@ -79,6 +80,7 @@ com\interivalle\DTO\CotizacionActividadResponse.class
 com\interivalle\DTO\RolUpdate.class
 com\interivalle\Servicio\ObraBlancaService.class
 com\interivalle\Modelo\enums\TipoItemCotizacion.class
+com\interivalle\DTO\MaterialAgrupadoResponse.class
 com\interivalle\Modelo\Servicios.class
 com\interivalle\DTO\ManoObraBaseRequest.class
 com\interivalle\DTO\ReprogramarVisitaRequest.class

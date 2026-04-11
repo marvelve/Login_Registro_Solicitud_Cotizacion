@@ -18,7 +18,8 @@ public class CotizacionSemanaResponse {
     private BigDecimal totalMateriales;
     private BigDecimal totalProductos;
     private BigDecimal totalSemana;
-    private List<CotizacionDetalleResponse> items;
+    //private List<CotizacionDetalleResponse> items;
+    private List<ActividadAgrupadaResponse> actividades;
 
     public Integer getSemana() {
         return semana;
@@ -60,11 +61,13 @@ public class CotizacionSemanaResponse {
         this.totalSemana = totalSemana;
     }
 
-    public List<CotizacionDetalleResponse> getItems() {
-        return items;
+    public List<ActividadAgrupadaResponse> getActividades() {
+        return actividades;
     }
 
-    public void setItems(List<CotizacionDetalleResponse> items) {
-        this.items = items;
+    public void setActividades(List<ActividadAgrupadaResponse> actividades) {
+        this.actividades = actividades;
     }
+    
+    
 }

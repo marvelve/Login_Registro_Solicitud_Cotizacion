@@ -19,6 +19,7 @@ public class CotizacionVistaCompletaResponse {
 
     private List<CotizacionDetalleResponse> detalleBase;
     private CotizacionPersonalizadaDetalleResponse personalizada;
+    private List<CotizacionSemanaResponse> semanas;
 
     public Integer getIdCotizacion() {
         return idCotizacion;
@@ -107,4 +108,14 @@ public class CotizacionVistaCompletaResponse {
     public void setPersonalizada(CotizacionPersonalizadaDetalleResponse personalizada) {
         this.personalizada = personalizada;
     }
+
+    public List<CotizacionSemanaResponse> getSemanas() {
+        return semanas;
+    }
+
+    public void setSemanas(List<CotizacionSemanaResponse> semanas) {
+        this.semanas = semanas;
+    }
+    
+    
 }

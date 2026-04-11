@@ -2,6 +2,7 @@ package com.interivalle.Servicio;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.interivalle.DTO.ActividadAgrupadaResponse;
 import com.interivalle.DTO.AprobarCotizacionRequest;
 import com.interivalle.DTO.CotizacionVistaCompletaResponse;
 import com.interivalle.DTO.CotizacionPersonalizadaDetalleResponse;
@@ -14,6 +15,7 @@ import com.interivalle.DTO.CotizacionResponse;
 import com.interivalle.DTO.CotizacionSemanaResponse;
 import com.interivalle.DTO.CrearCotizacionRequest;
 import com.interivalle.DTO.GenerarCotizacionBaseRequest;
+import com.interivalle.DTO.MaterialAgrupadoResponse;
 import com.interivalle.DTO.ObservacionRequest;
 import com.interivalle.Modelo.ActividadMaterial;
 import com.interivalle.Modelo.CatalogoItem;
@@ -712,53 +714,52 @@ private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizac
     }
 
     private CotizacionResponse toResponseCompleto(Cotizacion cot) {
-        CotizacionResponse r = toResponseBasico(cot);
+    CotizacionResponse r = toResponseBasico(cot);
 
-        List<CotizacionDetalle> detalles = detalleRepo.findByCotizacion_IdCotizacion(cot.getIdCotizacion());
-        detalles.sort(Comparator
-            .comparing((CotizacionDetalle d) -> d.getServicio().getIdServicio())
-            .thenComparing(d -> d.getTipoItem().name())
-            .thenComparing(d -> d.getCategoria() == null ? "" : d.getCategoria())
-            .thenComparing(d -> d.getSemana() == null ? 0 : d.getSemana())
-            .thenComparing(d -> d.getActividadMaterial() == null ? "" : d.getActividadMaterial())
-            .thenComparing(d -> d.getDescripcion() == null ? "" : d.getDescripcion())
-        );
+    List<CotizacionDetalle> detalles = detalleRepo.findByCotizacion_IdCotizacion(cot.getIdCotizacion());
+    detalles.sort(Comparator
+        .comparing((CotizacionDetalle d) -> d.getServicio().getIdServicio())
+        .thenComparing(d -> d.getTipoItem().name())
+        .thenComparing(d -> d.getCategoria() == null ? "" : d.getCategoria())
+        .thenComparing(d -> d.getSemana() == null ? 0 : d.getSemana())
+        .thenComparing(d -> d.getActividadMaterial() == null ? "" : d.getActividadMaterial())
+        .thenComparing(d -> d.getDescripcion() == null ? "" : d.getDescripcion())
+    );
 
-        List<CotizacionDetalleResponse> detResp = detalles.stream()
-            .map(this::toDetalleResponse)
-            .collect(Collectors.toList());
+    List<CotizacionDetalleResponse> detResp = detalles.stream()
+        .map(this::toDetalleResponse)
+        .collect(Collectors.toList());
 
-        r.setDetalles(detResp);
-        r.setSemanas(agruparPorSemanas(detResp));
-        r.setActividades(agruparPorActividad(detResp));
+    r.setDetalles(null); // para no seguir viendo la lista plana
+    r.setSemanas(agruparPorSemanas(detResp));
 
-        List<CotizacionObservacion> obs = obsRepo.findByCotizacion_IdCotizacionOrderByFechaAsc(cot.getIdCotizacion());
-        List<CotizacionObservacionResponse> obsResp = new ArrayList<>();
-        for (CotizacionObservacion o : obs) {
-            CotizacionObservacionResponse or = new CotizacionObservacionResponse();
-            or.setIdObservacion(o.getIdObservacion());
-            or.setTipo(o.getTipo());
-            or.setMensaje(o.getMensaje());
-            or.setUsuarioNombre(o.getUsuario().getNombreUsuario());
-            or.setFecha(o.getFecha());
-            obsResp.add(or);
-        }
-        r.setObservaciones(obsResp);
+    List<CotizacionObservacion> obs = obsRepo.findByCotizacion_IdCotizacionOrderByFechaAsc(cot.getIdCotizacion());
+    List<CotizacionObservacionResponse> obsResp = new ArrayList<>();
+    for (CotizacionObservacion o : obs) {
+        CotizacionObservacionResponse or = new CotizacionObservacionResponse();
+        or.setIdObservacion(o.getIdObservacion());
+        or.setTipo(o.getTipo());
+        or.setMensaje(o.getMensaje());
+        or.setUsuarioNombre(o.getUsuario().getNombreUsuario());
+        or.setFecha(o.getFecha());
+        obsResp.add(or);
+    }
+    r.setObservaciones(obsResp);
 
-        List<CotizacionHistorialEstado> hist = histRepo.findByCotizacion_IdCotizacionOrderByFechaAsc(cot.getIdCotizacion());
-        List<CotizacionHistorialResponse> histResp = new ArrayList<>();
-        for (CotizacionHistorialEstado h : hist) {
-            CotizacionHistorialResponse hr = new CotizacionHistorialResponse();
-            hr.setIdHistorial(h.getIdHistorial());
-            hr.setEstadoAnterior(h.getEstadoAnterior());
-            hr.setEstadoNuevo(h.getEstadoNuevo());
-            hr.setUsuarioNombre(h.getCambiadoPor().getNombreUsuario());
-            hr.setFecha(h.getFecha());
-            histResp.add(hr);
-        }
-        r.setHistorial(histResp);
+    List<CotizacionHistorialEstado> hist = histRepo.findByCotizacion_IdCotizacionOrderByFechaAsc(cot.getIdCotizacion());
+    List<CotizacionHistorialResponse> histResp = new ArrayList<>();
+    for (CotizacionHistorialEstado h : hist) {
+        CotizacionHistorialResponse hr = new CotizacionHistorialResponse();
+        hr.setIdHistorial(h.getIdHistorial());
+        hr.setEstadoAnterior(h.getEstadoAnterior());
+        hr.setEstadoNuevo(h.getEstadoNuevo());
+        hr.setUsuarioNombre(h.getCambiadoPor().getNombreUsuario());
+        hr.setFecha(h.getFecha());
+        histResp.add(hr);
+    }
+    r.setHistorial(histResp);
 
-        return r;
+    return r;
     }
 
     private CotizacionDetalleResponse toDetalleResponse(CotizacionDetalle d) {
@@ -783,69 +784,86 @@ private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizac
         return dr;
     }
 
-    private List<CotizacionSemanaResponse> agruparPorSemanas(List<CotizacionDetalleResponse> detalles) {
-        Map<Integer, List<CotizacionDetalleResponse>> agrupado = detalles.stream()
-            .collect(Collectors.groupingBy(d -> d.getSemana() == null ? 0 : d.getSemana()));
+private List<CotizacionSemanaResponse> agruparPorSemanas(List<CotizacionDetalleResponse> detalles) {
+    Map<Integer, List<CotizacionDetalleResponse>> agrupado = detalles.stream()
+        .collect(Collectors.groupingBy(d -> d.getSemana() == null ? 0 : d.getSemana()));
 
-        return agrupado.entrySet().stream()
-            .sorted(Map.Entry.comparingByKey())
-            .map(entry -> {
-                Integer semana = entry.getKey();
-                List<CotizacionDetalleResponse> items = entry.getValue();
+    return agrupado.entrySet().stream()
+        .sorted(Map.Entry.comparingByKey())
+        .map(entry -> {
+            Integer semana = entry.getKey();
+            List<CotizacionDetalleResponse> items = entry.getValue();
 
-                BigDecimal totalManoObra = sumarPorTipo(items, TipoItemCotizacion.ACTIVIDAD);
-                BigDecimal totalMateriales = sumarPorTipo(items, TipoItemCotizacion.MATERIAL);
-                BigDecimal totalProductos = sumarPorTipo(items, TipoItemCotizacion.PRODUCTO);
+            BigDecimal totalManoObra = sumarPorTipo(items, TipoItemCotizacion.ACTIVIDAD);
+            BigDecimal totalMateriales = sumarPorTipo(items, TipoItemCotizacion.MATERIAL);
+            BigDecimal totalProductos = sumarPorTipo(items, TipoItemCotizacion.PRODUCTO);
 
-                CotizacionSemanaResponse s = new CotizacionSemanaResponse();
-                s.setSemana(semana);
-                s.setItems(items);
-                s.setTotalManoObra(totalManoObra);
-                s.setTotalMateriales(totalMateriales);
-                s.setTotalProductos(totalProductos);
-                s.setTotalSemana(totalManoObra.add(totalMateriales).add(totalProductos));
+            CotizacionSemanaResponse s = new CotizacionSemanaResponse();
+            s.setSemana(semana);
+            s.setActividades(agruparActividadesConMateriales(items));
+            s.setTotalManoObra(totalManoObra);
+            s.setTotalMateriales(totalMateriales);
+            s.setTotalProductos(totalProductos);
+            s.setTotalSemana(totalManoObra);
 
-                return s;
+            return s;
+        })
+        .collect(Collectors.toList());
+}
+    
+    private String normalizarTexto(String texto) {
+    return texto == null ? "" : texto.trim().toLowerCase();
+    }
+    
+    private List<ActividadAgrupadaResponse> agruparActividadesConMateriales(List<CotizacionDetalleResponse> items) {
+
+    List<CotizacionDetalleResponse> actividades = items.stream()
+        .filter(i -> i.getTipoItem() == TipoItemCotizacion.ACTIVIDAD)
+        .collect(Collectors.toList());
+
+    List<CotizacionDetalleResponse> materiales = items.stream()
+        .filter(i -> i.getTipoItem() == TipoItemCotizacion.MATERIAL)
+        .collect(Collectors.toList());
+
+    List<ActividadAgrupadaResponse> resultado = new ArrayList<>();
+
+    for (CotizacionDetalleResponse act : actividades) {
+        ActividadAgrupadaResponse actividad = new ActividadAgrupadaResponse();
+        actividad.setActividad( act.getActividadMaterial() != null && !act.getActividadMaterial().trim().isEmpty()
+        ? act.getActividadMaterial()
+        : act.getDescripcion());
+        
+        actividad.setPrecioActividad(
+            act.getSubtotalVenta() != null ? act.getSubtotalVenta() : BigDecimal.ZERO
+        );
+
+        String nombreActividad = normalizarTexto(
+            act.getActividadMaterial() != null ? act.getActividadMaterial() : act.getDescripcion()
+        );
+
+        List<MaterialAgrupadoResponse> mats = materiales.stream()
+            .filter(mat -> {
+                String relacionMaterial = normalizarTexto(mat.getActividadMaterial());
+                return relacionMaterial.equals(nombreActividad);
+            })
+            .map(mat -> {
+                MaterialAgrupadoResponse m = new MaterialAgrupadoResponse();
+                m.setIdDetalle(mat.getIdDetalle());
+                m.setCantidad(mat.getCantidad());
+                m.setMaterial(mat.getDescripcion());
+                m.setPrecioMaterial(
+                    mat.getSubtotalVenta() != null ? mat.getSubtotalVenta() : BigDecimal.ZERO
+                );
+                return m;
             })
             .collect(Collectors.toList());
+
+        actividad.setMateriales(mats);
+        resultado.add(actividad);
     }
 
-    private List<CotizacionActividadResponse> agruparPorActividad(List<CotizacionDetalleResponse> detalles) {
-        Map<String, List<CotizacionDetalleResponse>> agrupado = detalles.stream()
-            .collect(Collectors.groupingBy(d -> {
-                Integer semana = d.getSemana() == null ? 0 : d.getSemana();
-                String actividad = d.getActividadMaterial() == null || d.getActividadMaterial().trim().isEmpty()
-                    ? "SIN ACTIVIDAD"
-                    : d.getActividadMaterial().trim();
-                return semana + "||" + actividad;
-            }));
-
-        return agrupado.entrySet().stream()
-            .sorted(Map.Entry.comparingByKey())
-            .map(entry -> {
-                List<CotizacionDetalleResponse> items = entry.getValue();
-                CotizacionDetalleResponse base = items.get(0);
-
-                Integer semana = base.getSemana();
-                String actividadMaterial = base.getActividadMaterial();
-
-                BigDecimal valorManoObra = sumarPorTipo(items, TipoItemCotizacion.ACTIVIDAD);
-                BigDecimal totalMateriales = sumarPorTipo(items, TipoItemCotizacion.MATERIAL);
-                BigDecimal totalProductos = sumarPorTipo(items, TipoItemCotizacion.PRODUCTO);
-
-                CotizacionActividadResponse a = new CotizacionActividadResponse();
-                a.setSemana(semana);
-                a.setActividadMaterial(actividadMaterial);
-                a.setItems(items);
-                a.setValorManoObra(valorManoObra);
-                a.setTotalMateriales(totalMateriales);
-                a.setTotalProductos(totalProductos);
-                a.setTotalActividad(valorManoObra.add(totalMateriales).add(totalProductos));
-
-                return a;
-            })
-            .collect(Collectors.toList());
-    }
+    return resultado;
+}
 
     private BigDecimal sumarPorTipo(List<CotizacionDetalleResponse> items, TipoItemCotizacion tipo) {
         return items.stream()
@@ -908,6 +926,7 @@ private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizac
     resp.setTotalGeneral(totalGeneral);
 
     resp.setDetalleBase(detalleBase);
+    resp.setSemanas(agruparPorSemanas(detalleBase));
     resp.setPersonalizada(personalizada);
 
     return resp;

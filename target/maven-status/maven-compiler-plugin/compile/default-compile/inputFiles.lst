@@ -11,6 +11,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\SolicitudControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\TestControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\VidrioControler.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ActividadAgrupadaResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\AprobarCotizacionRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\AuthResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CarpinteriaBaseRequest.java
@@ -39,6 +40,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\EstadoU
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\GenerarCotizacionBaseRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\LoginRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ManoObraBaseRequest.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\MaterialAgrupadoResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\MesonGranitoRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\MesonGranitoResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\MezonBaseRequest.java
