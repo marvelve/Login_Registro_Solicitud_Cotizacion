@@ -7,6 +7,7 @@ package com.interivalle.DTO;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  *
@@ -27,6 +28,13 @@ public class ManoObraBaseRequest {
 
     @NotNull(message = "Debe indicar si tiene división en pared")
     private Boolean divisionPared;
+    
+    private BigDecimal MetrosCuadradosPanelYeso;
+    private Integer CantidadPoyos;
+    private Integer CantidadPuntosElectricos;
+    private BigDecimal MetrosCuadradosMuro;
+    private BigDecimal MetrosCuadradosCielo;
+    private BigDecimal MetrosCuadradosTaparTuberias;
 
     public Double getMedidaAreaPrivada() {
         return medidaAreaPrivada;
@@ -59,5 +67,55 @@ public class ManoObraBaseRequest {
     public void setDivisionPared(Boolean divisionPared) {
         this.divisionPared = divisionPared;
     }
+
+    public BigDecimal getMetrosCuadradosPanelYeso() {
+        return MetrosCuadradosPanelYeso;
+    }
+
+    public void setMetrosCuadradosPanelYeso(BigDecimal MetrosCuadradosPanelYeso) {
+        this.MetrosCuadradosPanelYeso = MetrosCuadradosPanelYeso;
+    }
+
+    public Integer getCantidadPoyos() {
+        return CantidadPoyos;
+    }
+
+    public void setCantidadPoyos(Integer CantidadPoyos) {
+        this.CantidadPoyos = CantidadPoyos;
+    }
+
+    public Integer getCantidadPuntosElectricos() {
+        return CantidadPuntosElectricos;
+    }
+
+    public void setCantidadPuntosElectricos(Integer CantidadPuntosElectricos) {
+        this.CantidadPuntosElectricos = CantidadPuntosElectricos;
+    }
+
+    public BigDecimal getMetrosCuadradosMuro() {
+        return MetrosCuadradosMuro;
+    }
+
+    public void setMetrosCuadradosMuro(BigDecimal MetrosCuadradosMuro) {
+        this.MetrosCuadradosMuro = MetrosCuadradosMuro;
+    }
+
+    public BigDecimal getMetrosCuadradosCielo() {
+        return MetrosCuadradosCielo;
+    }
+
+    public void setMetrosCuadradosCielo(BigDecimal MetrosCuadradosCielo) {
+        this.MetrosCuadradosCielo = MetrosCuadradosCielo;
+    }
+
+    public BigDecimal getMetrosCuadradosTaparTuberias() {
+        return MetrosCuadradosTaparTuberias;
+    }
+
+    public void setMetrosCuadradosTaparTuberias(BigDecimal MetrosCuadradosTaparTuberias) {
+        this.MetrosCuadradosTaparTuberias = MetrosCuadradosTaparTuberias;
+    }
+    
+    
 }
 

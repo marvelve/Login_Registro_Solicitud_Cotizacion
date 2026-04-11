@@ -1,5 +1,7 @@
 package com.interivalle.Servicio;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interivalle.DTO.AprobarCotizacionRequest;
 import com.interivalle.DTO.CotizacionVistaCompletaResponse;
 import com.interivalle.DTO.CotizacionPersonalizadaDetalleResponse;
@@ -402,7 +404,8 @@ public class CotizacionService {
                 detActividad.setTipoItem(TipoItemCotizacion.ACTIVIDAD);
                 detActividad.setCategoria(actividad.getCategoria());
                 detActividad.setSemana(actividad.getSemana());
-                detActividad.setDescripcion(actividad.getNombreItem());
+               // detActividad.setDescripcion(actividad.getNombreItem());
+                detActividad.setDescripcion(obtenerDescripcionCatalogo(actividad));
                 detActividad.setActividadMaterial(actividad.getNombreItem());
                 detActividad.setCantidad(BigDecimal.ONE);
                 detActividad.setPrecioUnitarioVenta(valorActividad);
@@ -451,7 +454,8 @@ public class CotizacionService {
                     detMaterial.setTipoItem(TipoItemCotizacion.MATERIAL);
                     detMaterial.setCategoria(material.getCategoria());
                     detMaterial.setSemana(rel.getSemana() != null ? rel.getSemana() : actividad.getSemana());
-                    detMaterial.setDescripcion(material.getNombreItem());
+                    //detMaterial.setDescripcion(material.getNombreItem());
+                    detMaterial.setDescripcion(obtenerDescripcionCatalogo(material));
                     detMaterial.setActividadMaterial(actividad.getNombreItem());
                     detMaterial.setCantidad(cantidadMaterial);
                     detMaterial.setPrecioUnitarioVenta(precioVenta);
@@ -485,59 +489,150 @@ public class CotizacionService {
         return resp;
     }
     
-        private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizacionBaseRequest req) {
-        String formula = actividad.getFormulaCode() == null ? "" : actividad.getFormulaCode().trim();
+    private String obtenerDescripcionCatalogo(CatalogoItem item) {
+    if (item == null) {
+        return "";
+    }
 
-        BigDecimal precio = actividad.getPrecioUnitarioVenta() != null
-                ? actividad.getPrecioUnitarioVenta()
+    if (item.getDescripcion() != null && !item.getDescripcion().trim().isEmpty()) {
+        return item.getDescripcion().trim();
+    }
+
+    if (item.getNombreItem() != null) {
+        return item.getNombreItem().trim();
+    }
+
+    return "";
+}
+    
+    private BigDecimal obtenerAreaTotalDesdeParams(String paramsJson) {
+    try {
+        if (paramsJson == null || paramsJson.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(paramsJson);
+
+        if (root.has("areaTotal") && !root.get("areaTotal").isNull()) {
+            return root.get("areaTotal").decimalValue();
+        }
+
+        BigDecimal areaPiso = root.has("areaPiso") && !root.get("areaPiso").isNull()
+                ? root.get("areaPiso").decimalValue()
                 : BigDecimal.ZERO;
 
-        BigDecimal factor = actividad.getFactor() != null
-                ? actividad.getFactor()
-                : BigDecimal.ONE;
+        BigDecimal areaPared = root.has("areaPared") && !root.get("areaPared").isNull()
+                ? root.get("areaPared").decimalValue()
+                : BigDecimal.ZERO;
 
-        switch (formula) {
-            case "FIJO":
-                return precio;
+        return areaPiso.add(areaPared);
 
-            case "AREA_PRIVADA":
-                if (req.getManoObra() == null || req.getManoObra().getMedidaAreaPrivada() == null) {
-                    return BigDecimal.ZERO;
-                }
-                return precio.multiply(BigDecimal.valueOf(req.getManoObra().getMedidaAreaPrivada()));
-
-            case "AREA_PRIVADA_X_FACTOR":
-                if (req.getManoObra() == null || req.getManoObra().getMedidaAreaPrivada() == null) {
-                    return BigDecimal.ZERO;
-                }
-                return precio
-                        .multiply(factor)
-                        .multiply(BigDecimal.valueOf(req.getManoObra().getMedidaAreaPrivada()));
-
-            case "CANTIDAD_BANOS":
-                if (req.getManoObra() == null || req.getManoObra().getCantidadBanos() == null) {
-                    return BigDecimal.ZERO;
-                }
-                return precio.multiply(BigDecimal.valueOf(req.getManoObra().getCantidadBanos()));
-
-            case "CANTIDAD_BANOS_X_FACTOR":
-                if (req.getManoObra() == null || req.getManoObra().getCantidadBanos() == null) {
-                    return BigDecimal.ZERO;
-                }
-                return precio
-                        .multiply(factor)
-                        .multiply(BigDecimal.valueOf(req.getManoObra().getCantidadBanos()));
-
-            case "DIVISION_PARED_SI":
-                if (req.getManoObra() == null || req.getManoObra().getDivisionPared() == null) {
-                    return BigDecimal.ZERO;
-                }
-                return Boolean.TRUE.equals(req.getManoObra().getDivisionPared()) ? precio : BigDecimal.ZERO;
-
-            default:
-                return precio;
-        }
+    } catch (Exception e) {
+        return BigDecimal.ZERO;
     }
+}
+    
+private Integer obtenerCantidadSegunActividad(CatalogoItem actividad, GenerarCotizacionBaseRequest req) {
+    if (actividad == null || actividad.getNombreItem() == null || req.getManoObra() == null) {
+        return null;
+    }
+
+    String nombre = actividad.getNombreItem().toLowerCase().trim(); //minuscula
+
+    if (nombre.contains("poyo")) {
+        return req.getManoObra().getCantidadPoyos();
+    }
+
+    if (nombre.contains("centrar luces") ||  nombre.contains("punto electrico") || nombre.contains("puntos electricos")) {
+        return req.getManoObra().getCantidadPuntosElectricos();
+    }
+
+    return null;
+}
+
+private BigDecimal obtenerMetrosCuadradosSegunActividad(CatalogoItem actividad, GenerarCotizacionBaseRequest req) {
+    if (actividad == null || actividad.getNombreItem() == null || req.getManoObra() == null) {
+        return null;
+    }
+
+    String nombre = actividad.getNombreItem().toLowerCase().trim();
+
+    if (nombre.contains("muro") || nombre.contains("construccion de muro") ){
+        return req.getManoObra().getMetrosCuadradosMuro();
+    }
+
+    if (nombre.contains("drywall en cielo") || nombre.contains("cielo")) {
+        return req.getManoObra().getMetrosCuadradosCielo();
+    }
+
+    if (nombre.contains("tapar tuberias") || nombre.contains("tapar tuberías")) {
+        return req.getManoObra().getMetrosCuadradosTaparTuberias();
+    }
+
+    if (nombre.contains("panel yeso")) {
+        return req.getManoObra().getMetrosCuadradosPanelYeso();
+    }
+
+    return null;
+}
+
+private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizacionBaseRequest req) {
+    String formula = actividad.getFormulaCode() == null ? "" : actividad.getFormulaCode().trim();
+
+    BigDecimal precio = actividad.getPrecioUnitarioVenta() != null
+            ? actividad.getPrecioUnitarioVenta()
+            : BigDecimal.ZERO;
+
+    BigDecimal factor = actividad.getFactor() != null
+            ? actividad.getFactor()
+            : BigDecimal.ONE;
+
+    switch (formula) {
+        case "FIJO":
+            return precio;
+
+        case "AREA_PRIVADA_X_FACTOR":
+            if (req.getManoObra() == null || req.getManoObra().getMedidaAreaPrivada() == null) {
+                return BigDecimal.ZERO;
+            }
+            return precio.multiply(
+                    factor.multiply(BigDecimal.valueOf(req.getManoObra().getMedidaAreaPrivada()))
+            );
+
+        case "AREA_PRIVADA_X_PRECIO":
+            if (req.getManoObra() == null || req.getManoObra().getMedidaAreaPrivada() == null) {
+                return BigDecimal.ZERO;
+            }
+            return precio.multiply(
+                    BigDecimal.valueOf(req.getManoObra().getMedidaAreaPrivada())
+            );
+
+        case "METRO_CUADRADO_X_PRECIO":
+            BigDecimal metros2 = obtenerMetrosCuadradosSegunActividad(actividad, req);
+            if (metros2 == null || metros2.compareTo(BigDecimal.ZERO) <= 0) {
+                return BigDecimal.ZERO;
+            }
+            return precio.multiply(metros2);
+
+        case "CANTIDAD_X_PRECIO":
+            Integer cantidad = obtenerCantidadSegunActividad(actividad, req);
+            if (cantidad == null || cantidad <= 0) {
+                return BigDecimal.ZERO;
+            }
+            return precio.multiply(BigDecimal.valueOf(cantidad));
+
+        case "AREA_FIJA_X_PRECIO":
+            BigDecimal areaFija = obtenerAreaTotalDesdeParams(actividad.getParamsJson());
+            if (areaFija == null || areaFija.compareTo(BigDecimal.ZERO) <= 0) {
+                return BigDecimal.ZERO;
+            }
+            return precio.multiply(areaFija);
+
+        default:
+            return BigDecimal.ZERO;
+    }
+}
         
         
         private BigDecimal calcularCantidadMaterial(ActividadMaterial rel, GenerarCotizacionBaseRequest req) {
