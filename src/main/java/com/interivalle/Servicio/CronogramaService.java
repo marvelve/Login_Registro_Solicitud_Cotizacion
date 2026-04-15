@@ -6,6 +6,7 @@ package com.interivalle.Servicio;
 
 import com.interivalle.DTO.CrearCronogramaRequest;
 import com.interivalle.DTO.CronogramaDetalleVistaDTO;
+import com.interivalle.DTO.CronogramaListResponse;
 import com.interivalle.DTO.CronogramaResponse;
 import com.interivalle.DTO.CronogramaVistaResponse;
 import com.interivalle.DTO.SemanaCronogramaDTO;
@@ -14,11 +15,13 @@ import com.interivalle.Modelo.CotizacionDetalle;
 import com.interivalle.Modelo.Cronograma;
 import com.interivalle.Modelo.CronogramaDetalle;
 import com.interivalle.Modelo.Solicitud;
+import com.interivalle.Modelo.Usuario;
 import com.interivalle.Modelo.enums.EstadoActividadCronograma;
 import com.interivalle.Modelo.enums.EstadoCronograma;
 import com.interivalle.Repositorio.CotizacionRepositorio;
 import com.interivalle.Repositorio.CronogramaDetalleRepositorio;
 import com.interivalle.Repositorio.CronogramaRepositorio;
+import com.interivalle.Repositorio.UsuarioRepositorio;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -48,6 +51,9 @@ public class CronogramaService {
 
     @Autowired
     private CotizacionRepositorio cotizacionRepo;
+    
+    @Autowired
+    private UsuarioRepositorio usuarioRepo;
 
     public CronogramaVistaResponse obtenerVistaPorCotizacion(Integer idCotizacion) {
 
@@ -287,5 +293,85 @@ public class CronogramaService {
         );
 
         return response;
+    }
+    
+    
+     public List<CronogramaListResponse> listarCronogramasPorUsuario(String correoUsuario) {
+        Usuario usuario = usuarioRepo.findByCorreoUsuario(correoUsuario)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuario no encontrado"
+                ));
+
+        List<Cronograma> cronogramas;
+
+        if (usuario.getIdRol() == 1 || usuario.getIdRol() == 2) {
+            cronogramas = cronogramaRepo.findAllByOrderByIdCronogramaDesc();
+        } else {
+            cronogramas = cronogramaRepo
+                    .findByCotizacion_Solicitud_Usuario_IdUsuarioOrderByIdCronogramaDesc(usuario.getIdUsuario());
+        }
+
+        return cronogramas.stream()
+                .map(this::mapToListResponse)
+                .toList();
+    }
+
+    private CronogramaListResponse mapToListResponse(Cronograma cronograma) {
+        CronogramaListResponse res = new CronogramaListResponse();
+
+        res.setId(cronograma.getIdCronograma());
+        res.setIdCronograma(cronograma.getIdCronograma());
+
+        if (cronograma.getCotizacion() != null) {
+            res.setIdCotizacion(cronograma.getCotizacion().getIdCotizacion());
+
+            if (cronograma.getCotizacion().getSolicitud() != null) {
+                res.setNombreProyecto(
+                        cronograma.getCotizacion().getSolicitud().getNombreProyectoUsuario()
+                );
+
+                if (cronograma.getCotizacion().getSolicitud().getUsuario() != null) {
+                    res.setNombreCliente(
+                            cronograma.getCotizacion().getSolicitud().getUsuario().getNombreUsuario()
+                    );
+                }
+            }
+        }
+
+        res.setEstadoCronograma(
+                cronograma.getEstadoCronograma() != null
+                        ? cronograma.getEstadoCronograma().name()
+                        : null
+        );
+
+        res.setFechaInicio(cronograma.getFechaInicio());
+        res.setFechaFin(cronograma.getFechaFinEstimada());
+
+        res.setAvanceGeneral(calcularAvanceGeneral(cronograma));
+
+        return res;
+    }
+
+    private Integer calcularAvanceGeneral(Cronograma cronograma) {
+        if (cronograma.getDetalles() == null || cronograma.getDetalles().isEmpty()) {
+            return 0;
+        }
+
+        int cantidadConPorcentaje = 0;
+        int suma = 0;
+
+        for (CronogramaDetalle detalle : cronograma.getDetalles()) {
+            if (detalle.getPorcentaje() != null) {
+                suma += detalle.getPorcentaje().intValue();
+                cantidadConPorcentaje++;
+            }
+        }
+
+        if (cantidadConPorcentaje == 0) {
+            return 0;
+        }
+
+        return Math.round((float) suma / cantidadConPorcentaje);
     }
 }
