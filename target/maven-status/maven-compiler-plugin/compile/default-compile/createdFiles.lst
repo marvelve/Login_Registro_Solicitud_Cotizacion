@@ -80,6 +80,7 @@ com\interivalle\DTO\CronogramaDetalleVistaDTO.class
 com\interivalle\Modelo\CotizacionMezon.class
 com\interivalle\DTO\SolicitudResponse.class
 com\interivalle\Servicio\AdminUsuarioServicio.class
+com\interivalle\Controlador\CotizacionControler.class
 com\interivalle\DTO\CronogramaListResponse.class
 com\interivalle\DTO\EstadoUpdate.class
 com\interivalle\Security\SecurityConfig.class

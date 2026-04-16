@@ -21,6 +21,7 @@ public class CotizacionResponse {
 
     private Integer solicitudId;
     private String nombreProyecto;
+    private String nombreUsuario;
 
     private TipoCotizacion tipo;
     private EstadoCotizacion estado;
@@ -166,5 +167,14 @@ public class CotizacionResponse {
     public void setActividades(List<CotizacionActividadResponse> actividades) {
         this.actividades = actividades;
     }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+    
     
 }

@@ -90,9 +90,7 @@ public class CotizacionService {
     @Autowired private CotizacionMezonRepositorio cotizacionMezonRepo;
     @Autowired private CronogramaService cronogramaServicio;
 
-    // =========================================================
     // CREA COTIZACION MANUAL
-    // =========================================================
     @Transactional
     public CotizacionResponse crearCotizacion(Integer idUsuario, CrearCotizacionRequest req) {
 
@@ -171,9 +169,8 @@ public class CotizacionService {
         return toResponseCompleto(cot);
     }
 
-    // =========================================================
     // LISTA POR CLIENTE
-    // =========================================================
+
     public List<CotizacionResponse> listarPorCliente(Integer idUsuario) {
         List<Cotizacion> lista = cotizacionRepo.findBySolicitud_Usuario_IdUsuario(idUsuario);
         List<CotizacionResponse> out = new ArrayList<>();
@@ -182,18 +179,38 @@ public class CotizacionService {
         }
         return out;
     }
+    
+    //LISTAR TODAS LAS COTIZACIONES
+    public List<CotizacionResponse> listarTodas() {
+        List<Cotizacion> lista = cotizacionRepo.findAll();
+        List<CotizacionResponse> out = new ArrayList<>();
 
-    // =========================================================
+        for (Cotizacion c : lista) {
+            out.add(toResponseBasico(c));
+        }
+
+        return out;
+    }
+
     // DETALLE POR ID CLIENTE
-    // =========================================================
     public CotizacionResponse verDetalle(Integer idUsuario, Integer idCotizacion) {
         Cotizacion cot = getCotizacionDelUsuario(idUsuario, idCotizacion);
         return toResponseCompleto(cot);
     }
+    
+    //DETALLE ADMIN Y SUPERVISOR
+    public CotizacionResponse verDetalleAdminSupervisor(Integer idCotizacion) {
+        Cotizacion cot = cotizacionRepo.findById(idCotizacion)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Cotización no encontrada"
+            ));
 
-    // =========================================================
+        return toResponseCompleto(cot);
+    }
+
     // ENVIAR
-    // =========================================================
+
     @Transactional
     public CotizacionResponse enviar(Integer idUsuario, Integer idCotizacion) {
         Cotizacion cot = getCotizacionDelUsuario(idUsuario, idCotizacion);
@@ -692,6 +709,7 @@ private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizac
 
         r.setSolicitudId(cot.getSolicitud().getIdSolicitud());
         r.setNombreProyecto(cot.getSolicitud().getNombreProyectoUsuario());
+        r.setNombreUsuario(cot.getSolicitud().getUsuario().getNombreUsuario());
 
         r.setTipo(cot.getTipo());
         r.setEstado(cot.getEstado());
@@ -930,6 +948,69 @@ private List<CotizacionSemanaResponse> agruparPorSemanas(List<CotizacionDetalleR
     resp.setPersonalizada(personalizada);
 
     return resp;
+    }
+    
+    // VISTA COMPLETA PARA DMIN Y SUPERVISOR
+    public CotizacionVistaCompletaResponse obtenerVistaCompletaAdminSupervisor(Integer idCotizacion) {
+        Cotizacion cot = cotizacionRepo.findById(idCotizacion)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Cotización no encontrada"
+            ));
+
+        List<CotizacionDetalle> detalles = detalleRepo.findByCotizacion_IdCotizacion(cot.getIdCotizacion());
+        detalles.sort(Comparator
+            .comparing((CotizacionDetalle d) -> d.getServicio().getIdServicio())
+            .thenComparing(d -> d.getTipoItem().name())
+            .thenComparing(d -> d.getCategoria() == null ? "" : d.getCategoria())
+            .thenComparing(d -> d.getSemana() == null ? 0 : d.getSemana())
+            .thenComparing(d -> d.getActividadMaterial() == null ? "" : d.getActividadMaterial())
+            .thenComparing(d -> d.getDescripcion() == null ? "" : d.getDescripcion())
+        );
+
+        List<CotizacionDetalleResponse> detalleBase = detalles.stream()
+            .map(this::toDetalleResponse)
+            .collect(Collectors.toList());
+
+        CotizacionPersonalizadaDetalleResponse personalizada = null;
+        BigDecimal totalAdicionales = BigDecimal.ZERO;
+
+        try {
+            personalizada = cotizacionPersonalizadaService.obtenerDetallePorCotizacion(idCotizacion);
+
+            if (personalizada != null && personalizada.getTotal() != null) {
+                totalAdicionales = personalizada.getTotal();
+            }
+        } catch (Exception e) {
+            personalizada = null;
+            totalAdicionales = BigDecimal.ZERO;
+            throw e;
+        }
+
+        BigDecimal totalBase = cot.getTotalEstimado() != null
+            ? cot.getTotalEstimado()
+            : BigDecimal.ZERO;
+
+        BigDecimal totalGeneral = totalBase.add(totalAdicionales);
+
+        CotizacionVistaCompletaResponse resp = new CotizacionVistaCompletaResponse();
+        resp.setIdCotizacion(cot.getIdCotizacion());
+        resp.setNombreProyecto(cot.getSolicitud().getNombreProyectoUsuario());
+        resp.setEstado(cot.getEstado().name());
+
+        resp.setTotalManoObra(cot.getTotalManoObra() != null ? cot.getTotalManoObra() : BigDecimal.ZERO);
+        resp.setTotalMateriales(cot.getTotalMateriales() != null ? cot.getTotalMateriales() : BigDecimal.ZERO);
+        resp.setTotalProductos(cot.getTotalProductos() != null ? cot.getTotalProductos() : BigDecimal.ZERO);
+        resp.setTotalEstimadoBase(totalBase);
+
+        resp.setTotalAdicionales(totalAdicionales);
+        resp.setTotalGeneral(totalGeneral);
+
+        resp.setDetalleBase(detalleBase);
+        resp.setSemanas(agruparPorSemanas(detalleBase));
+        resp.setPersonalizada(personalizada);
+
+        return resp;
     }
     
     ///VALIDAR COTIZACION ANTES DE EDITAR    
