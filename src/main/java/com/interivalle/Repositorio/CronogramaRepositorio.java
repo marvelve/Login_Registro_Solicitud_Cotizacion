@@ -22,4 +22,6 @@ public interface CronogramaRepositorio extends JpaRepository<Cronograma, Integer
     List<Cronograma> findAllByOrderByIdCronogramaDesc();
 
     List<Cronograma> findByCotizacion_Solicitud_Usuario_IdUsuarioOrderByIdCronogramaDesc(Integer idUsuario);
+    
+    Optional<Cronograma> findById(Integer idCronograma);
 }

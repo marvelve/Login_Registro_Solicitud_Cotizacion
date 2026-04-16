@@ -577,7 +577,7 @@ private BigDecimal obtenerMetrosCuadradosSegunActividad(CatalogoItem actividad, 
 
     String nombre = actividad.getNombreItem().toLowerCase().trim();
 
-    if (nombre.contains("muro") || nombre.contains("construccion de muro") ){
+    if (nombre.contains("muro en drywall") || nombre.contains("muro") ){
         return req.getManoObra().getMetrosCuadradosMuro();
     }
 
@@ -632,6 +632,7 @@ private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizac
             if (metros2 == null || metros2.compareTo(BigDecimal.ZERO) <= 0) {
                 return BigDecimal.ZERO;
             }
+            System.out.println("Metros cuadrados: " + metros2);
             return precio.multiply(metros2);
 
         case "CANTIDAD_X_PRECIO":

@@ -56,6 +56,8 @@ public class CronogramaDetalle {
 
     @Column(name = "novedades", length = 1000)
     private String novedades;
+    
+    
             
 
     public Integer getIdCronogramaDetalle() {

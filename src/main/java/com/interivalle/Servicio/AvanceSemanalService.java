@@ -43,19 +43,42 @@ public class AvanceSemanalService {
     @Autowired
     private UsuarioRepositorio usuarioRepo;
 
-   public AvanceSemanalResponse registrarAvance(AvanceSemanalRequest req, Integer idUsuario) {
+    public AvanceSemanalResponse registrarAvance(AvanceSemanalRequest req, Integer idUsuario) {
     if (req == null || req.getIdCronograma() == null) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cronograma es obligatorio");
     }
 
-    if (req.getNumeroSemana() == null) {
+    if (req.getNumeroSemana() == null || req.getNumeroSemana() <= 0) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La semana es obligatoria");
+    }
+
+    if (req.getPorcentajeSemana() == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El porcentaje semanal es obligatorio");
+    }
+
+    System.out.println("REQ porcentajeSemana = " + req.getPorcentajeSemana());
+    if (req.getPorcentajeSemana().compareTo(java.math.BigDecimal.ZERO) < 0
+            || req.getPorcentajeSemana().compareTo(new java.math.BigDecimal("100")) > 0) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El porcentaje semanal debe estar entre 0 y 100");
     }
 
     Cronograma cronograma = cronogramaRepo.findById(req.getIdCronograma())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cronograma no encontrado"));
 
-    AvanceSemanal avance = new AvanceSemanal();
+    if (cronograma.getTotalSemanas() == null || cronograma.getTotalSemanas() <= 0) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cronograma no tiene total de semanas definido");
+    }
+
+    if (req.getNumeroSemana() > cronograma.getTotalSemanas()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "La semana ingresada supera el total de semanas del cronograma");
+    }
+
+    // Buscar si ya existe avance para esa semana
+    AvanceSemanal avance = avanceRepo
+            .findByCronograma_IdCronogramaAndNumeroSemana(req.getIdCronograma(), req.getNumeroSemana())
+            .orElse(new AvanceSemanal());
+
     avance.setCronograma(cronograma);
     avance.setNumeroSemana(req.getNumeroSemana());
     avance.setFechaRegistro(LocalDateTime.now());
@@ -63,14 +86,37 @@ public class AvanceSemanalService {
     avance.setDescripcion(req.getDescripcion());
     avance.setObservaciones(req.getObservaciones());
     avance.setPorcentajeSemana(req.getPorcentajeSemana());
-    avance.setPorcentajeGeneral(req.getPorcentajeGeneral());
     avance.setRegistradoPor(idUsuario);
-    avance.setEstado("REGISTRADO");
+    avance.setEstado(determinarEstadoSemana(req.getPorcentajeSemana()));
+
+    // Calcular porcentaje general del proyecto
+    java.math.BigDecimal sumaPorcentajes = calcularSumaPorcentajesConSemanaActual(
+            cronograma.getIdCronograma(),
+            req.getNumeroSemana(),
+            req.getPorcentajeSemana()
+    );
+
+    java.math.BigDecimal porcentajeGeneral = sumaPorcentajes.divide(
+            java.math.BigDecimal.valueOf(cronograma.getTotalSemanas()),
+            2,
+            java.math.RoundingMode.HALF_UP
+    );
+
+    if (porcentajeGeneral.compareTo(new java.math.BigDecimal("100")) > 0) {
+        porcentajeGeneral = new java.math.BigDecimal("100.00");
+    }
+
+    avance.setPorcentajeGeneral(porcentajeGeneral);
+
+    // Actualizar cronograma
+    cronograma.setAvanceGeneral(porcentajeGeneral);
+    cronograma.setEstado(determinarEstadoCronograma(porcentajeGeneral));
+    cronogramaRepo.save(cronograma);
 
     AvanceSemanal guardado = avanceRepo.save(avance);
 
     return mapToResponse(guardado);
-    }
+}
 
    public List<AvanceSemanalResponse> listarPorCronograma(Integer idCronograma) {
     return avanceRepo.findByCronograma_IdCronogramaOrderByNumeroSemanaAsc(idCronograma)
@@ -110,7 +156,7 @@ public class AvanceSemanalService {
             .stream()
             .map(this::mapComentarioToResponse)
             .toList();
-}   
+}
     
     private AvanceSemanalResponse mapToResponse(AvanceSemanal avance) {
         AvanceSemanalResponse res = new AvanceSemanalResponse();
@@ -137,5 +183,53 @@ public class AvanceSemanalService {
     res.setComentario(comentario.getComentario());
     res.setFechaComentario(comentario.getFechaComentario());
     return res;
+    }
+    
+    private java.math.BigDecimal calcularSumaPorcentajesConSemanaActual(
+        Integer idCronograma,
+        Integer numeroSemanaActual,
+        java.math.BigDecimal porcentajeSemanaActual) {
+
+    List<AvanceSemanal> avances = avanceRepo.findByCronograma_IdCronogramaOrderByNumeroSemanaAsc(idCronograma);
+
+    java.math.BigDecimal suma = java.math.BigDecimal.ZERO;
+    boolean actualizada = false;
+
+    for (AvanceSemanal a : avances) {
+        if (a.getNumeroSemana().equals(numeroSemanaActual)) {
+            suma = suma.add(porcentajeSemanaActual);
+            actualizada = true;
+        } else {
+            suma = suma.add(a.getPorcentajeSemana() != null
+                    ? a.getPorcentajeSemana()
+                    : java.math.BigDecimal.ZERO);
+        }
+    }
+
+    if (!actualizada) {
+        suma = suma.add(porcentajeSemanaActual);
+    }
+
+    return suma;
+}
+
+private String determinarEstadoSemana(java.math.BigDecimal porcentajeSemana) {
+    if (porcentajeSemana == null || porcentajeSemana.compareTo(java.math.BigDecimal.ZERO) == 0) {
+        return "PENDIENTE";
+    }
+    if (porcentajeSemana.compareTo(new java.math.BigDecimal("100")) < 0) {
+        return "EN_PROCESO";
+    }
+    return "COMPLETADA";
+}
+
+    private String determinarEstadoCronograma(java.math.BigDecimal porcentajeGeneral) {
+        if (porcentajeGeneral == null || porcentajeGeneral.compareTo(java.math.BigDecimal.ZERO) == 0) {
+            return "PENDIENTE";
+        }
+        if (porcentajeGeneral.compareTo(new java.math.BigDecimal("100")) < 0) {
+            return "EN_PROCESO";
+        }
+        return "FINALIZADO";
     }
 }

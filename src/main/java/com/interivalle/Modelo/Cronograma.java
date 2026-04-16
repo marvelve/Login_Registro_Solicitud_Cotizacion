@@ -6,6 +6,7 @@ package com.interivalle.Modelo;
 
 import com.interivalle.Modelo.enums.EstadoCronograma;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,9 @@ public class Cronograma {
 
     @OneToMany(mappedBy = "cronograma", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CronogramaDetalle> detalles = new ArrayList<>();
+    
+    private BigDecimal avanceGeneral;
+    private String estado;
 
     public Integer getIdCronograma() {
         return idCronograma;
@@ -110,4 +114,23 @@ public class Cronograma {
     public void setDetalles(List<CronogramaDetalle> detalles) {
         this.detalles = detalles;
     }
+
+    public BigDecimal getAvanceGeneral() {
+        return avanceGeneral;
+    }
+
+    public void setAvanceGeneral(BigDecimal avanceGeneral) {
+        this.avanceGeneral = avanceGeneral;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+    
+    
+    
 }
