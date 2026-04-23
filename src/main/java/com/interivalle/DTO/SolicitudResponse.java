@@ -25,6 +25,8 @@ public class SolicitudResponse {
     private String correoUsuario;
     private LocalDate fechaVisita;
     private LocalTime horaVisita;
+    private String direccionVisita;
+    private String celularCliente;
 
     public Integer getIdSolicitud() {
         return idSolicitud;
@@ -96,6 +98,22 @@ public class SolicitudResponse {
 
     public void setHoraVisita(LocalTime horaVisita) {
         this.horaVisita = horaVisita;
+    }
+
+    public String getDireccionVisita() {
+        return direccionVisita;
+    }
+
+    public void setDireccionVisita(String direccionVisita) {
+        this.direccionVisita = direccionVisita;
+    }
+
+    public String getCelularCliente() {
+        return celularCliente;
+    }
+
+    public void setCelularCliente(String celularCliente) {
+        this.celularCliente = celularCliente;
     }
     
     

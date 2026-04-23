@@ -9,6 +9,8 @@ import com.interivalle.Modelo.SolicitudServicios;
 import com.interivalle.Modelo.Servicios;
 import com.interivalle.Modelo.Usuario;
 import com.interivalle.Modelo.VisitaTecnica;
+import com.interivalle.Modelo.enums.ModuloNotificacion;
+import com.interivalle.Modelo.enums.TipoNotificacion;
 import com.interivalle.Repositorio.SolicitudRepositorio;
 import com.interivalle.Repositorio.SolicitudServiciosRepositorio;
 import com.interivalle.Repositorio.ServiciosRepositorio;
@@ -41,6 +43,7 @@ public class SolicitudService {
     @Autowired private ServiciosRepositorio serviciosRepo;
     @Autowired private SolicitudServiciosRepositorio solicitudServicioRepo;
     @Autowired private VisitaTecnicaRepositorio visitaTecnicaRepo;
+    @Autowired private NotificacionService notificacionService;
 
     @Transactional
     public SolicitudResponse crearSolicitud(CrearSolicitud dto) {
@@ -194,6 +197,24 @@ public class SolicitudService {
             visita.setEstadoVisita("PENDIENTE");
 
             visitaTecnicaRepo.save(visita);
+            // CREAR NOTIFICACIÓN PARA SUPERVISORES
+    List<Usuario> supervisores = usuarioRepo.findByIdRol(2);
+
+    String nombreCliente = usuario.getNombreUsuario();
+    String nombreProyecto = solicitud.getNombreProyectoUsuario();
+
+    String titulo = "Nueva visita técnica solicitada";
+    String mensaje = "El cliente " + nombreCliente
+            + " solicitó una visita técnica para el proyecto '" + nombreProyecto + "'.";
+
+        notificacionService.crearNotificacionParaVarios(
+            supervisores,
+            TipoNotificacion.VISITA_TECNICA_CREADA,
+            ModuloNotificacion.VISITA_TECNICA,
+            titulo,
+            mensaje,
+            solicitud.getIdSolicitud()
+    );
         }
 
         return buildResponseFromSolicitud(solicitud.getIdSolicitud());
@@ -236,6 +257,9 @@ public class SolicitudService {
                 .ifPresent(visita -> {
                     resp.setFechaVisita(visita.getFechaVisita());
                     resp.setHoraVisita(visita.getHoraVisita());
+                    resp.setDireccionVisita(visita.getDireccionVisita());
+                    resp.setCelularCliente(visita.getCelularCliente());
+
                 });
         }
     }
@@ -323,7 +347,7 @@ public class SolicitudService {
     }
     
     @Transactional
-    public SolicitudResponse reprogramarVisita(Integer idSolicitud, ReprogramarVisitaRequest req) {
+    public SolicitudResponse reprogramarVisita(Integer idSolicitud, ReprogramarVisitaRequest req, Integer idUsuario) {
 
         Solicitud solicitud = solicitudRepo.findById(idSolicitud)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
@@ -341,6 +365,10 @@ public class SolicitudService {
                 HttpStatus.BAD_REQUEST,
                 "Solo se pueden reprogramar visitas en estado PENDIENTE o REPROGRAMADA"
             );
+        }
+
+        if (req == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los datos de reprogramación son obligatorios");
         }
 
         if (req.getFechaVisita() == null) {
@@ -367,6 +395,9 @@ public class SolicitudService {
                 "La hora de visita debe estar entre 08:00-12:00 o 14:00-17:00"
             );
         }
+
+        Usuario usuarioAccion = usuarioRepo.findById(idUsuario)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
         VisitaTecnica visita = visitaTecnicaRepo.findBySolicitud_IdSolicitud(idSolicitud)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Visita técnica no encontrada"));
@@ -397,6 +428,81 @@ public class SolicitudService {
 
         visitaTecnicaRepo.save(visita);
         solicitudRepo.save(solicitud);
+
+        String nombreProyecto = solicitud.getNombreProyectoUsuario();
+        String fechaTexto = req.getFechaVisita().toString();
+        String horaTexto = req.getHoraVisita().toString();
+
+        // ROLES:
+        // 1 = ADMIN
+        // 2 = SUPERVISOR
+        // 3 = CLIENTE
+        Integer rolAccion = usuarioAccion.getIdRol();
+
+        if (rolAccion != null && rolAccion == 3) {
+            // SI REPROGRAMA EL CLIENTE -> NOTIFICAR A SUPERVISORES
+            List<Usuario> supervisores = usuarioRepo.findByIdRol(2);
+
+            String titulo = "Visita técnica reprogramada por el cliente";
+            String mensaje = "El cliente " + usuarioAccion.getNombreUsuario()
+                    + " reprogramó la visita técnica del proyecto '" + nombreProyecto
+                    + "' para la fecha " + fechaTexto
+                    + " a las " + horaTexto + ".";
+
+            notificacionService.crearNotificacionParaVarios(
+                    supervisores,
+                    TipoNotificacion.VISITA_TECNICA_REPROGRAMADA,
+                    ModuloNotificacion.VISITA_TECNICA,
+                    titulo,
+                    mensaje,
+                    solicitud.getIdSolicitud()
+            );
+
+        } else if (rolAccion != null && (rolAccion == 1 || rolAccion == 2)) {
+            // SI REPROGRAMA ADMIN O SUPERVISOR -> NOTIFICAR AL CLIENTE
+            if (solicitud.getUsuario() != null) {
+                Usuario cliente = solicitud.getUsuario();
+
+                String titulo = "Visita técnica reprogramada";
+                String mensaje = "La visita técnica del proyecto '" + nombreProyecto
+                        + "' fue reprogramada para la fecha " + fechaTexto
+                        + " a las " + horaTexto + ".";
+
+                notificacionService.crearNotificacion(
+                        cliente,
+                        TipoNotificacion.VISITA_TECNICA_REPROGRAMADA,
+                        ModuloNotificacion.VISITA_TECNICA,
+                        titulo,
+                        mensaje,
+                        solicitud.getIdSolicitud()
+                );
+            }
+        }
+
+        return buildResponseFromSolicitud(idSolicitud);
+    }
+    
+    @Transactional
+    public SolicitudResponse marcarVisitaRealizada(Integer idSolicitud) {
+
+        Solicitud solicitud = solicitudRepo.findById(idSolicitud)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
+
+        if (!"VISITA_TECNICA".equalsIgnoreCase(solicitud.getTipoSolicitud())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Solo las visitas técnicas pueden marcarse como realizadas"
+            );
+        }
+
+        VisitaTecnica visita = visitaTecnicaRepo.findBySolicitud_IdSolicitud(idSolicitud)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Visita técnica no encontrada"));
+
+        solicitud.setEstado("REALIZADA");
+        visita.setEstadoVisita("REALIZADA");
+
+        solicitudRepo.save(solicitud);
+        visitaTecnicaRepo.save(visita);
 
         return buildResponseFromSolicitud(idSolicitud);
     }

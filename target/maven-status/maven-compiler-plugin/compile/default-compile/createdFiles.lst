@@ -39,6 +39,8 @@ com\interivalle\Modelo\CotizacionManoObra.class
 com\interivalle\DTO\ActividadAgrupadaResponse.class
 com\interivalle\Controlador\CarpinteriaControler.class
 com\interivalle\Modelo\CotizacionObservacion.class
+com\interivalle\DTO\NotificacionResponse.class
+com\interivalle\Modelo\enums\ModuloNotificacion.class
 com\interivalle\DTO\CronogramaVistaResponse.class
 com\interivalle\Controlador\AuthControler.class
 com\interivalle\DTO\ObraBlancaRequest.class
@@ -75,6 +77,7 @@ com\interivalle\Repositorio\CotizacionHistorialRepositorio.class
 com\interivalle\Repositorio\CotizacionVidrioRepositorio.class
 com\interivalle\DTO\UsuarioCreateRequest.class
 com\interivalle\DTO\CotizacionPersonalizadaResponse.class
+com\interivalle\Modelo\Notificacion.class
 com\interivalle\DTO\CarpinteriaResponse.class
 com\interivalle\DTO\CronogramaDetalleVistaDTO.class
 com\interivalle\Modelo\CotizacionMezon.class
@@ -90,8 +93,10 @@ com\interivalle\Servicio\ObraBlancaService.class
 com\interivalle\Modelo\enums\TipoItemCotizacion.class
 com\interivalle\DTO\MaterialAgrupadoResponse.class
 com\interivalle\Modelo\Servicios.class
+com\interivalle\Servicio\NotificacionService.class
 com\interivalle\DTO\ManoObraBaseRequest.class
 com\interivalle\DTO\ReprogramarVisitaRequest.class
+com\interivalle\Controlador\NotificacionControler.class
 com\interivalle\Servicio\SolicitudService.class
 com\interivalle\Repositorio\CotizacionCarpinteriaRepositorio.class
 com\interivalle\DTO\MezonBaseRequest.class
@@ -100,6 +105,7 @@ com\interivalle\Modelo\Carpinteria.class
 com\interivalle\DTO\AvanceSemanalResponse.class
 com\interivalle\DTO\CotizacionResponse.class
 com\interivalle\Repositorio\UsuarioRepositorio.class
+com\interivalle\Modelo\enums\TipoNotificacion.class
 com\interivalle\Repositorio\CotizacionDetalleRepositorio.class
 com\interivalle\Modelo\enums\TipoCotizacion.class
 com\interivalle\Repositorio\CronogramaDetalleRepositorio.class
@@ -139,6 +145,7 @@ com\interivalle\Modelo\enums\TipoObservacion.class
 com\interivalle\Repositorio\CotizacionObservacionRepositorio.class
 com\interivalle\Modelo\SolicitudServicios.class
 com\interivalle\DTO\CotizacionSemanaResponse.class
+com\interivalle\Repositorio\NotificacionRepositorio.class
 com\interivalle\DTO\EvidenciaAvanceRequest.class
 com\interivalle\Controlador\EvidenciaAvanceControler.class
 com\interivalle\Repositorio\SolicitudServiciosRepositorio.class

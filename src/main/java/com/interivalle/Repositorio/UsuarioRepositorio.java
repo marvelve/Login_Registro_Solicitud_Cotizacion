@@ -27,6 +27,8 @@ public interface UsuarioRepositorio extends JpaRepository<Usuario, Integer> {
     
     List<Usuario> findByEstadoUsuario(Boolean estadoUsuario);
 
+    List<Usuario> findByIdRol(Integer idRol);
+
 }
 
 

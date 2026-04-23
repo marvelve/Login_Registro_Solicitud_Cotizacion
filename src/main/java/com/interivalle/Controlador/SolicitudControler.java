@@ -6,11 +6,13 @@ package com.interivalle.Controlador;
 
 import com.interivalle.DTO.*;
 import com.interivalle.Modelo.Usuario;
+import com.interivalle.Repositorio.UsuarioRepositorio;
 import com.interivalle.Servicio.SolicitudService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +28,9 @@ public class SolicitudControler {
 
     @Autowired
     private SolicitudService service;
+    
+     @Autowired
+    private UsuarioRepositorio usuarioRepo;
 
     @PostMapping
     public ResponseEntity<SolicitudResponse> crear(@RequestBody CrearSolicitud dto) {
@@ -53,12 +58,30 @@ public class SolicitudControler {
         return service.listarTodas();
     }
     
-    @PutMapping("/{idSolicitud}/reprogramar")
+     @PutMapping("/{idSolicitud}/reprogramar")
     public ResponseEntity<SolicitudResponse> reprogramarVisita(
             @PathVariable Integer idSolicitud,
-            @RequestBody ReprogramarVisitaRequest req) {
+            @RequestBody ReprogramarVisitaRequest req,
+            Authentication authentication) {
 
-        return ResponseEntity.ok(service.reprogramarVisita(idSolicitud, req));
+        if (authentication == null || authentication.getName() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no autenticado");
+        }
+
+        String correoUsuario = authentication.getName();
+
+        Usuario usuario = usuarioRepo.findByCorreoUsuario(correoUsuario)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        return ResponseEntity.ok(
+                service.reprogramarVisita(idSolicitud, req, usuario.getIdUsuario())
+        );
+    }
+    
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERVISOR')")
+    @PutMapping("/{idSolicitud}/realizada")
+    public ResponseEntity<SolicitudResponse> marcarVisitaRealizada(@PathVariable Integer idSolicitud) {
+        return ResponseEntity.ok(service.marcarVisitaRealizada(idSolicitud));
     }
 }
 

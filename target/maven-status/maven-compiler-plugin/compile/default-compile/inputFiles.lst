@@ -11,6 +11,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CronogramaControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\EvidenciaAvanceControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\MesonGranitoControler.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\NotificacionControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\ObraBlancaControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\SolicitudControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\TestControler.java
@@ -55,6 +56,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\Materia
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\MesonGranitoRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\MesonGranitoResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\MezonBaseRequest.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\NotificacionResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ObraBlancaRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ObraBlancaResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ObservacionRequest.java
@@ -91,11 +93,14 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\Cron
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\EstadoActividadCronograma.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\EstadoCotizacion.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\EstadoCronograma.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\ModuloNotificacion.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\TipoCotizacion.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\TipoItemCotizacion.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\TipoNotificacion.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\enums\TipoObservacion.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\EvidenciaAvance.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\MesonGranito.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\Notificacion.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\ObraBlanca.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\Rol.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Modelo\Servicios.java
@@ -123,6 +128,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\CronogramaRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\EvidenciaAvanceRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\MesonGranitoRepositorio.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\NotificacionRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\ObraBlancaRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\ServiciosRepositorio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Repositorio\SolicitudRepositorio.java
@@ -143,6 +149,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\Co
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\CronogramaService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\EvidenciaAvanceService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\MesonGranitoService.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\NotificacionService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\ObraBlancaService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\SolicitudService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\VidrioService.java

@@ -12,6 +12,8 @@ import com.interivalle.Modelo.AvanceSemanal;
 import com.interivalle.Modelo.ComentarioAvance;
 import com.interivalle.Modelo.Cronograma;
 import com.interivalle.Modelo.Usuario;
+import com.interivalle.Modelo.enums.ModuloNotificacion;
+import com.interivalle.Modelo.enums.TipoNotificacion;
 import com.interivalle.Repositorio.AvanceSemanalRepositorio;
 import com.interivalle.Repositorio.ComentarioAvanceRepositorio;
 import com.interivalle.Repositorio.CronogramaRepositorio;
@@ -42,6 +44,9 @@ public class AvanceSemanalService {
 
     @Autowired
     private UsuarioRepositorio usuarioRepo;
+    
+    @Autowired
+    private NotificacionService notificacionService;
 
     public AvanceSemanalResponse registrarAvance(AvanceSemanalRequest req, Integer idUsuario) {
     if (req == null || req.getIdCronograma() == null) {
@@ -115,6 +120,28 @@ public class AvanceSemanalService {
 
     AvanceSemanal guardado = avanceRepo.save(avance);
 
+    // CREAR NOTIFICACIÓN AL CLIENTE
+    if (cronograma.getCotizacion() != null
+            && cronograma.getCotizacion().getSolicitud() != null
+            && cronograma.getCotizacion().getSolicitud().getUsuario() != null) {
+
+        Usuario cliente = cronograma.getCotizacion().getSolicitud().getUsuario();
+
+        String nombreProyecto = cronograma.getCotizacion().getSolicitud().getNombreProyectoUsuario();
+        String titulo = "Nuevo avance registrado";
+        String mensaje = "Se registró un nuevo avance para el proyecto '" + nombreProyecto
+                + "', correspondiente a la semana " + guardado.getNumeroSemana() + ".";
+
+        notificacionService.crearNotificacion(
+                cliente,
+                TipoNotificacion.AVANCE_REGISTRADO,
+                ModuloNotificacion.AVANCE,
+                titulo,
+                mensaje,
+                guardado.getIdAvance()
+        );
+    }
+    
     return mapToResponse(guardado);
 }
 
