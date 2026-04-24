@@ -23,6 +23,7 @@ public class CotizacionDetalleResponse {
     private String actividadMaterial;
 
     private BigDecimal cantidad;
+    private String unidad;
     private BigDecimal precioUnitarioVenta;
     private BigDecimal subtotalVenta;
 
@@ -131,6 +132,14 @@ public class CotizacionDetalleResponse {
 
     public void setActividadMaterial(String actividadMaterial) {
         this.actividadMaterial = actividadMaterial;
+    }
+
+    public String getUnidad() {
+        return unidad;
+    }
+
+    public void setUnidad(String unidad) {
+        this.unidad = unidad;
     }
     
     

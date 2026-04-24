@@ -6,6 +6,7 @@ package com.interivalle.DTO;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  *
@@ -22,15 +23,22 @@ public class CarpinteriaBaseRequest {
     @Min(value = 0, message = "La cantidad de puertas no puede ser negativa")
     private Integer cantidadPuertas;
 
-    @NotNull(message = "Debe indicar si tiene mueble alto cocina")
-    private Boolean muebleAltoCocina;
+    @NotNull(message = "Debe indicar la medida del mueble alto cocina")
+    private BigDecimal  muebleAltoCocina;
 
-    @NotNull(message = "Debe indicar si tiene mueble bajo cocina")
-    private Boolean muebleBajoCocina;
+    @NotNull(message = "Debe indicar la medida del mueble bajo cocina")
+    private BigDecimal  muebleBajoCocina;
 
+    @Min(value = 0, message = "La cantidad de baños no puede ser negativa")
+    private Integer cantidadBanos;
+    
     @NotNull(message = "La cantidad de muebles de baño es obligatoria")
     @Min(value = 0, message = "La cantidad de muebles de baño no puede ser negativa")
-    private Integer cantidadMuebleBano;
+    private Integer cantidadMuebleBajoBano;
+    
+    @NotNull(message = "La cantidad de muebles de baño es obligatoria")
+    @Min(value = 0, message = "La cantidad de muebles de baño no puede ser negativa")
+    private Integer cantidadMuebleAltoBano;
 
     public Integer getCantidadCloset() {
         return cantidadCloset;
@@ -48,27 +56,45 @@ public class CarpinteriaBaseRequest {
         this.cantidadPuertas = cantidadPuertas;
     }
 
-    public Boolean getMuebleAltoCocina() {
+    public BigDecimal getMuebleAltoCocina() {
         return muebleAltoCocina;
     }
 
-    public void setMuebleAltoCocina(Boolean muebleAltoCocina) {
+    public void setMuebleAltoCocina(BigDecimal muebleAltoCocina) {
         this.muebleAltoCocina = muebleAltoCocina;
     }
 
-    public Boolean getMuebleBajoCocina() {
+    public BigDecimal getMuebleBajoCocina() {
         return muebleBajoCocina;
     }
 
-    public void setMuebleBajoCocina(Boolean muebleBajoCocina) {
+    public void setMuebleBajoCocina(BigDecimal muebleBajoCocina) {
         this.muebleBajoCocina = muebleBajoCocina;
     }
 
-    public Integer getCantidadMuebleBano() {
-        return cantidadMuebleBano;
+    public Integer getCantidadMuebleBajoBano() {
+        return cantidadMuebleBajoBano;
     }
 
-    public void setCantidadMuebleBano(Integer cantidadMuebleBano) {
-        this.cantidadMuebleBano = cantidadMuebleBano;
+    public void setCantidadMuebleBajoBano(Integer cantidadMuebleBajoBano) {
+        this.cantidadMuebleBajoBano = cantidadMuebleBajoBano;
     }
+
+    public Integer getCantidadMuebleAltoBano() {
+        return cantidadMuebleAltoBano;
+    }
+
+    public void setCantidadMuebleAltoBano(Integer cantidadMuebleAltoBano) {
+        this.cantidadMuebleAltoBano = cantidadMuebleAltoBano;
+    }
+
+    public Integer getCantidadBanos() {
+        return cantidadBanos;
+    }
+
+    public void setCantidadBanos(Integer cantidadBanos) {
+        this.cantidadBanos = cantidadBanos;
+    }
+
+    
 }

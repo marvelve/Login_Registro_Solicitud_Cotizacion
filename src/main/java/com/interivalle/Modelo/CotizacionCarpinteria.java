@@ -5,6 +5,7 @@
 package com.interivalle.Modelo;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 /**
  *
  * @author mary_
@@ -32,13 +33,13 @@ public class CotizacionCarpinteria {
     private Integer cantidadPuertas;
 
     @Column(name = "mueble_alto_cocina", nullable = false)
-    private Boolean muebleAltoCocina;
+    private BigDecimal muebleAltoCocina;
 
     @Column(name = "mueble_bajo_cocina", nullable = false)
-    private Boolean muebleBajoCocina;
+    private BigDecimal muebleBajoCocina;
 
-    @Column(name = "cantidad_mueble_bano", nullable = false)
-    private Integer cantidadMuebleBano;
+    @Column(name = "cantidad_banos", nullable = false)
+    private Integer cantidadBanos;
 
     public Integer getIdCotizacionCarpinteria() {
         return idCotizacionCarpinteria;
@@ -72,27 +73,27 @@ public class CotizacionCarpinteria {
         this.cantidadPuertas = cantidadPuertas;
     }
 
-    public Boolean getMuebleAltoCocina() {
+    public BigDecimal getMuebleAltoCocina() {
         return muebleAltoCocina;
     }
 
-    public void setMuebleAltoCocina(Boolean muebleAltoCocina) {
+    public void setMuebleAltoCocina(BigDecimal muebleAltoCocina) {
         this.muebleAltoCocina = muebleAltoCocina;
     }
 
-    public Boolean getMuebleBajoCocina() {
+    public BigDecimal getMuebleBajoCocina() {
         return muebleBajoCocina;
     }
 
-    public void setMuebleBajoCocina(Boolean muebleBajoCocina) {
+    public void setMuebleBajoCocina(BigDecimal muebleBajoCocina) {
         this.muebleBajoCocina = muebleBajoCocina;
+    }  
+
+    public Integer getCantidadBanos() {
+        return cantidadBanos;
     }
 
-    public Integer getCantidadMuebleBano() {
-        return cantidadMuebleBano;
-    }
-
-    public void setCantidadMuebleBano(Integer cantidadMuebleBano) {
-        this.cantidadMuebleBano = cantidadMuebleBano;
+    public void setCantidadBanos(Integer cantidadBanos) {
+        this.cantidadBanos = cantidadBanos;
     }
 }

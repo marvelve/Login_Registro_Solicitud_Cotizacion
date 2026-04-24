@@ -53,6 +53,8 @@ public class CotizacionDetalle {
     // Cantidad decimal (en vidrio y mesón hay 1.20, 1.50, etc.)
     @Column(name = "cantidad", nullable = false, precision = 12, scale = 2)
     private BigDecimal cantidad;
+    
+    private String unidad;
 
     @Column(name = "precio_unitario_venta", nullable = false, precision = 12, scale = 2)
     private BigDecimal precioUnitarioVenta = BigDecimal.ZERO;
@@ -140,6 +142,15 @@ public class CotizacionDetalle {
     public void setSubtotalVenta(BigDecimal subtotalVenta) {
         this.subtotalVenta = subtotalVenta;
     }
+
+    public String getUnidad() {
+        return unidad;
+    }
+
+    public void setUnidad(String unidad) {
+        this.unidad = unidad;
+    }
+    
     
     
 }

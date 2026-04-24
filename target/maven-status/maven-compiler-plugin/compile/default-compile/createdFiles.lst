@@ -41,6 +41,7 @@ com\interivalle\Controlador\CarpinteriaControler.class
 com\interivalle\Modelo\CotizacionObservacion.class
 com\interivalle\DTO\NotificacionResponse.class
 com\interivalle\Modelo\enums\ModuloNotificacion.class
+com\interivalle\Servicio\CatalogoItemService.class
 com\interivalle\DTO\CronogramaVistaResponse.class
 com\interivalle\Controlador\AuthControler.class
 com\interivalle\DTO\ObraBlancaRequest.class
@@ -76,10 +77,13 @@ com\interivalle\Controlador\CotizacionPersonalizadaControler.class
 com\interivalle\Repositorio\CotizacionHistorialRepositorio.class
 com\interivalle\Repositorio\CotizacionVidrioRepositorio.class
 com\interivalle\DTO\UsuarioCreateRequest.class
+com\interivalle\Controlador\CatalogoItemControler.class
+com\interivalle\DTO\CatalogoItemResponse.class
 com\interivalle\DTO\CotizacionPersonalizadaResponse.class
 com\interivalle\Modelo\Notificacion.class
 com\interivalle\DTO\CarpinteriaResponse.class
 com\interivalle\DTO\CronogramaDetalleVistaDTO.class
+com\interivalle\DTO\ActualizarPrecioCatalogoRequest.class
 com\interivalle\Modelo\CotizacionMezon.class
 com\interivalle\DTO\SolicitudResponse.class
 com\interivalle\Servicio\AdminUsuarioServicio.class

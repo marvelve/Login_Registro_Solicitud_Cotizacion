@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interivalle.DTO.ActividadAgrupadaResponse;
 import com.interivalle.DTO.AprobarCotizacionRequest;
+import com.interivalle.DTO.CarpinteriaBaseRequest;
 import com.interivalle.DTO.CotizacionVistaCompletaResponse;
 import com.interivalle.DTO.CotizacionPersonalizadaDetalleResponse;
 import com.interivalle.DTO.CotizacionActividadResponse;
@@ -366,7 +367,7 @@ public class CotizacionService {
             carp.setCantidadPuertas(req.getCarpinteria().getCantidadPuertas());
             carp.setMuebleAltoCocina(req.getCarpinteria().getMuebleAltoCocina());
             carp.setMuebleBajoCocina(req.getCarpinteria().getMuebleBajoCocina());
-            carp.setCantidadMuebleBano(req.getCarpinteria().getCantidadMuebleBano());
+            carp.setCantidadBanos(req.getCarpinteria().getCantidadBanos());
             cotizacionCarpinteriaRepo.save(carp);
         }
 
@@ -488,6 +489,56 @@ public class CotizacionService {
                 }
             }
         }
+        
+        if (req.getCarpinteria() != null) {
+        System.out.println("=== ENTRANDO A GENERAR DETALLES CARPINTERIA ===");
+
+        List<CatalogoItem> productosCarpinteria = catalogoItemRepo.buscarVigentesPorServicioYTipo(
+                2,
+                TipoItemCotizacion.PRODUCTO,
+                hoy
+        );
+
+        System.out.println("Productos carpintería encontrados: " + productosCarpinteria.size());
+
+        for (CatalogoItem producto : productosCarpinteria) {
+            BigDecimal cantidad = obtenerCantidadProductoCarpinteria(producto, req.getCarpinteria());
+
+            if (cantidad == null || cantidad.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            BigDecimal precioVenta = producto.getPrecioUnitarioVenta() != null
+                    ? producto.getPrecioUnitarioVenta()
+                    : BigDecimal.ZERO;
+
+            BigDecimal precioProveedor = producto.getPrecioUnitarioProveedor() != null
+                    ? producto.getPrecioUnitarioProveedor()
+                    : BigDecimal.ZERO;
+
+            BigDecimal subtotalVenta = cantidad.multiply(precioVenta);
+            BigDecimal subtotalProveedor = cantidad.multiply(precioProveedor);
+
+            CotizacionDetalle detProducto = new CotizacionDetalle();
+            detProducto.setCotizacion(cot);
+            detProducto.setServicio(producto.getServicio());
+            detProducto.setTipoItem(TipoItemCotizacion.PRODUCTO);
+            detProducto.setCategoria(producto.getCategoria());
+            detProducto.setSemana(producto.getSemana());
+            detProducto.setDescripcion(obtenerDescripcionCatalogo(producto));
+            detProducto.setActividadMaterial(producto.getNombreItem());
+            detProducto.setCantidad(cantidad);
+            detProducto.setUnidad(producto.getUnidad());
+            detProducto.setPrecioUnitarioVenta(precioVenta);
+            detProducto.setSubtotalVenta(subtotalVenta);
+            detProducto.setPrecioUnitarioProveedor(precioProveedor);
+            detProducto.setSubtotalProveedor(subtotalProveedor);
+
+            detalleRepo.save(detProducto);
+
+            totalProductos = totalProductos.add(subtotalVenta);
+        }
+    }
 
         cot.setTotalManoObra(totalManoObra);
         cot.setTotalMateriales(totalMateriales);
@@ -749,7 +800,7 @@ private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizac
         .map(this::toDetalleResponse)
         .collect(Collectors.toList());
 
-    r.setDetalles(null); // para no seguir viendo la lista plana
+    r.setDetalles(detResp);
     r.setSemanas(agruparPorSemanas(detResp));
 
     List<CotizacionObservacion> obs = obsRepo.findByCotizacion_IdCotizacionOrderByFechaAsc(cot.getIdCotizacion());
@@ -795,6 +846,7 @@ private BigDecimal calcularValorActividad(CatalogoItem actividad, GenerarCotizac
         dr.setActividadMaterial(d.getActividadMaterial());
 
         dr.setCantidad(d.getCantidad());
+        dr.setUnidad(d.getUnidad());
         dr.setPrecioUnitarioVenta(d.getPrecioUnitarioVenta());
         dr.setSubtotalVenta(d.getSubtotalVenta());
         dr.setPrecioUnitarioProveedor(d.getPrecioUnitarioProveedor());
@@ -1027,6 +1079,58 @@ private List<CotizacionSemanaResponse> agruparPorSemanas(List<CotizacionDetalleR
                 "La cotización no se puede modificar porque está en estado " + cotizacion.getEstado().name()
             );
         }
+    }
+    
+        private BigDecimal obtenerCantidadProductoCarpinteria(CatalogoItem producto, CarpinteriaBaseRequest req) {
+        if (producto == null || producto.getNombreItem() == null || req == null) {
+            return BigDecimal.ZERO;
+        }
+
+        String nombre = producto.getNombreItem().toLowerCase().trim();
+
+        if (nombre.equals("closet") || nombre.contains("closet")) {
+            return req.getCantidadCloset() == null
+                    ? BigDecimal.ZERO
+                    : BigDecimal.valueOf(req.getCantidadCloset());
+        }
+
+        if (nombre.contains("puerta maciza lisa") || nombre.contains("puerta")) {
+            return req.getCantidadPuertas() == null
+                    ? BigDecimal.ZERO
+                    : BigDecimal.valueOf(req.getCantidadPuertas());
+        }
+
+        if (nombre.contains("mueble alto de cocina")) {
+            return req.getMuebleAltoCocina() == null
+                    ? BigDecimal.ZERO
+                    : req.getMuebleAltoCocina();
+        }
+
+        if (nombre.contains("mueble bajo de cocina")) {
+            return req.getMuebleBajoCocina() == null
+                    ? BigDecimal.ZERO
+                    : req.getMuebleBajoCocina();
+        }
+
+        // solución rápida: un solo campo del formulario alimenta ambos muebles de baño
+       if (nombre.contains("mueble bajo baño") || nombre.contains("mueble bajo bano")) {
+        return req.getCantidadBanos() == null
+                ? BigDecimal.ZERO
+                : BigDecimal.valueOf(req.getCantidadBanos());
+        }
+
+        if (nombre.contains("mueble alto para baño") || nombre.contains("mueble alto para bano")) {
+            return req.getCantidadBanos() == null
+                    ? BigDecimal.ZERO
+                    : BigDecimal.valueOf(req.getCantidadBanos());
+        }
+
+        // todavía no existe en tu formulario actual
+        if (nombre.contains("mueble barra")) {
+            return BigDecimal.ZERO;
+        }
+
+        return BigDecimal.ZERO;
     }
     
 }

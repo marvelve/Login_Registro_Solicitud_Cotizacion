@@ -20,6 +20,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface CatalogoItemRepositorio extends JpaRepository<CatalogoItem, Integer> {
 
+    List<CatalogoItem> findByActivoTrue();
+
+    List<CatalogoItem> findByTipoItem(String tipoItem);
+
+    List<CatalogoItem> findByServicio_IdServicios(Integer idServicio);
     List<CatalogoItem> findByServicio_IdServiciosAndActivoTrue(Integer idServicio);
 
     List<CatalogoItem> findByServicio_IdServiciosAndTipoItemAndActivoTrue(

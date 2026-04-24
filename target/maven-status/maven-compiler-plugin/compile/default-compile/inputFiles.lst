@@ -5,6 +5,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\AuthControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\AvanceSemanalControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CarpinteriaControler.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CatalogoItemControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\ClienteCotizacionControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CotizacionControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\CotizacionPersonalizadaControler.java
@@ -17,6 +18,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\TestControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Controlador\VidrioControler.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ActividadAgrupadaResponse.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ActualizarPrecioCatalogoRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\AprobarCotizacionRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\AuthResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\AvanceSemanalRequest.java
@@ -24,6 +26,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\AvanceS
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CarpinteriaBaseRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CarpinteriaRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CarpinteriaResponse.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CatalogoItemResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ComentarioAvanceRequest.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\ComentarioAvanceResponse.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\DTO\CotizacionActividadResponse.java
@@ -144,6 +147,7 @@ C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\Ad
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\AuthServicio.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\AvanceSemanalService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\CarpinteriaService.java
+C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\CatalogoItemService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\CotizacionPersonalizadaService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\CotizacionService.java
 C:\Users\mary_\Documents\Backend_Login\src\main\java\com\interivalle\Servicio\CronogramaService.java
